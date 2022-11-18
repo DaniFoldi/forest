@@ -2,6 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id 'java'
+    id 'net.kyori.blossom' version '1.3.1'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
@@ -14,39 +15,77 @@ java {
 
 repositories {
     mavenCentral()
-    maven { url('https://repo.danifoldi.com/maven-releases/') }
-    maven { url('https://repo.papermc.io/repository/maven-public/') }
+    maven { url 'https://repo.danifoldi.com/repository/maven-releases/' }
+    maven { url 'https://repo.papermc.io/repository/maven-public/' }
+    maven { url 'https://nexus.velocitypowered.com/repository/maven-public/' }
+    maven { url 'https://repo.viaversion.com' }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
+    compileOnly 'io.github.waterfallmc:waterfall-api:1.19-R0.1-SNAPSHOT'
+    compileOnly 'io.papermc.paper:paper-api:1.19.2-R0.1-SNAPSHOT'
+    compileOnly 'com.velocitypowered:velocity-api:3.1.1'
+    annotationProcessor 'com.velocitypowered:velocity-api:3.1.1'
+
+    implementation 'grapefruit:grapefruit:1.5.0'
+    implementation 'com.danifoldi:microbase:0.4.0'
+    implementation 'com.danifoldi:DataVerse:0.4.1'
+
+    implementation 'javax.inject:javax.inject:1'
+    implementation 'com.google.dagger:dagger:2.44.2'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.44.2'
+
+    compileOnly 'org.jetbrains:annotations:23.0.0'
 }
 
-file('.').eachFileRecurse { file ->
-    if (file.name.equalsIgnoreCase("${file.parentFile.name}Tree.java")) {
-        def ver = ""
-        file.readLines()[file.readLines().findIndexOf {
-            it.contains("TREE_VERSION")
-        } + 1].eachMatch(/\s+return "\d+\.\d+.\d+";/) {
-            ver = (it =~ /\d+\.\d+\.\d+/)[0]
-        }
-
-        if (ver == "") {
-            throw new RuntimeException("Failed to parse version of ${file.parentFile.name}")
-        }
-
-        task "build-${file.parentFile.name}"(type: ShadowJar) {
-            classifier = 'all'
-            from sourceSets.main.output
-            minimize()
-            include "com/danifoldi/forest/tree/${file.parentFile.name}/*"
-            dependencies {
-                exclude(dependency('*:*:*'))
+task 'build-tree' {
+    file('.').eachFileRecurse { file ->
+        if (file.name.equalsIgnoreCase("${file.parentFile.name}Tree.java")) {
+            def ver = ""
+            file.readLines()[file.readLines().findIndexOf {
+                it.contains("TREE_VERSION")
+            } + 1].eachMatch(/\s+return "\d+\.\d+.\d+";/) {
+                ver = (it =~ /\d+\.\d+\.\d+/)[0]
             }
-            archiveFileName = "forest-${file.parentFile.name}-${ver}.jar"
-            configurations = []
+
+            if (ver == "") {
+                throw new RuntimeException("Failed to parse version of ${file.parentFile.name}")
+            }
+            try {
+                tasks.getByName("build-tree-${file.parentFile.name}")
+                return
+            } catch (ignored) {
+                // ignore
+            }
+
+            task "build-tree-${file.parentFile.name}"(type: ShadowJar) {
+                classifier = 'all'
+                from sourceSets.main.output
+                minimize()
+                include "com/danifoldi/forest/tree/${file.parentFile.name}/*"
+                dependencies {
+                    exclude(dependency('*:*:*'))
+                }
+                archiveFileName = "forest-${file.parentFile.name}-${ver}.jar"
+                configurations = []
+            }
+            tasks.build.dependsOn("build-tree-${file.parentFile.name}")
         }
-        tasks.build.dependsOn("build-${file.parentFile.name}")
     }
+}
+tasks.build.dependsOn('build-tree')
+
+processResources {
+    from('src/main/resources') {
+        expand(version: project.version)
+        duplicatesStrategy(DuplicatesStrategy.INCLUDE)
+    }
+}
+
+blossom {
+    replaceTokenIn('src/main/java/com/danifoldi/forest/seed/velocity/VelocityForest.java')
+    replaceToken '@version@', project.version
 }
 
 build.dependsOn(shadowJar)
