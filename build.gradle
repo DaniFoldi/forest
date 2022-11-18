@@ -1,0 +1,59 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+group 'com.danifoldi'
+version '1.0.0'
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
+}
+
+repositories {
+    mavenCentral()
+    maven { url('https://repo.danifoldi.com/maven-releases/') }
+    maven { url('https://repo.papermc.io/repository/maven-public/') }
+}
+
+dependencies {
+}
+
+file('.').eachFileRecurse { file ->
+    if (file.name.equalsIgnoreCase("${file.parentFile.name}Tree.java")) {
+        def ver = ""
+        file.readLines()[file.readLines().findIndexOf {
+            it.contains("TREE_VERSION")
+        } + 1].eachMatch(/\s+return "\d+\.\d+.\d+";/) {
+            ver = (it =~ /\d+\.\d+\.\d+/)[0]
+        }
+
+        if (ver == "") {
+            throw new RuntimeException("Failed to parse version of ${file.parentFile.name}")
+        }
+
+        task "build-${file.parentFile.name}"(type: ShadowJar) {
+            classifier = 'all'
+            from sourceSets.main.output
+            minimize()
+            include "com/danifoldi/forest/tree/${file.parentFile.name}/*"
+            dependencies {
+                exclude(dependency('*:*:*'))
+            }
+            archiveFileName = "forest-${file.parentFile.name}-${ver}.jar"
+            configurations = []
+        }
+        tasks.build.dependsOn("build-${file.parentFile.name}")
+    }
+}
+
+build.dependsOn(shadowJar)
+
+shadowJar {
+    minimize()
+    exclude 'com/danifoldi/forest/tree/*'
+
+    archiveFileName = "forest-${project.version}.jar"
+}
