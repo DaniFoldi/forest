@@ -57,7 +57,7 @@ task 'build-tree' {
             }.readLines())
 
             if (ver == "") {
-                //throw new RuntimeException("Failed to parse version of ${f.parentFile.name}")
+                throw new RuntimeException("Failed to parse version of ${f.parentFile.name}")
             }
             try {
                 tasks.getByName("build-tree-${f.parentFile.name}")
