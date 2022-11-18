@@ -40,37 +40,45 @@ dependencies {
 }
 
 task 'build-tree' {
-    file('.').eachFileRecurse { file ->
-        if (file.name.equalsIgnoreCase("${file.parentFile.name}Tree.java")) {
-            def ver = ""
-            file.readLines()[file.readLines().findIndexOf {
-                it.contains("TREE_VERSION")
-            } + 1].eachMatch(/\s+return "\d+\.\d+.\d+";/) {
-                ver = (it =~ /\d+\.\d+\.\d+/)[0]
+
+    file('.').eachFileRecurse { f ->
+        if (f.name.equalsIgnoreCase("${f.parentFile.name}Tree.java")) {
+            def ver = ''
+            file('src/main/resources/trees').listFiles().find {
+                it.name.contains(f.parentFile.name)
+            }.readLines().each {
+                it.eachMatch(/version: '\d+\.\d+\.\d+'/) {
+                    ver = (it =~ /\d+\.\d+\.\d+/)[0]
+                }
             }
 
+            println(file('src/main/resources/trees').listFiles().find {
+                it.name.contains(f.parentFile.name)
+            }.readLines())
+
             if (ver == "") {
-                throw new RuntimeException("Failed to parse version of ${file.parentFile.name}")
+                //throw new RuntimeException("Failed to parse version of ${f.parentFile.name}")
             }
             try {
-                tasks.getByName("build-tree-${file.parentFile.name}")
+                tasks.getByName("build-tree-${f.parentFile.name}")
                 return
             } catch (ignored) {
                 // ignore
             }
 
-            task "build-tree-${file.parentFile.name}"(type: ShadowJar) {
+            task "build-tree-${f.parentFile.name}"(type: ShadowJar) {
                 classifier = 'all'
                 from sourceSets.main.output
                 minimize()
-                include "com/danifoldi/forest/tree/${file.parentFile.name}/*"
+                include "com/danifoldi/forest/tree/${f.parentFile.name}/*"
+                include "trees/${f.parentFile.name}.dml"
                 dependencies {
                     exclude(dependency('*:*:*'))
                 }
-                archiveFileName = "forest-${file.parentFile.name}-${ver}.jar"
+                archiveFileName = "forest-${f.parentFile.name}-${ver}.jar"
                 configurations = []
             }
-            tasks.build.dependsOn("build-tree-${file.parentFile.name}")
+            tasks.build.dependsOn("build-tree-${f.parentFile.name}")
         }
     }
 }
