@@ -52,10 +52,6 @@ task 'build-tree' {
                 }
             }
 
-            println(file('src/main/resources/trees').listFiles().find {
-                it.name.contains(f.parentFile.name)
-            }.readLines())
-
             if (ver == "") {
                 throw new RuntimeException("Failed to parse version of ${f.parentFile.name}")
             }
