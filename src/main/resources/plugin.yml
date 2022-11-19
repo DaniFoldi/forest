@@ -1,0 +1,7 @@
+api-version: 1.13
+authors:
+  - DaniFoldi
+description: Forest is a module system of Trees (microservices)
+main: com.danifoldi.forest.seed.spigot.SpigotForest
+name: Forest
+version: ${version}

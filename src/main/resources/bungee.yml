@@ -1,0 +1,5 @@
+author: DaniFoldi
+description: Forest is a module system of Trees (microservices)
+main: com.danifoldi.forest.seed.bungee.BungeeForest
+name: Forest
+version: ${version}
