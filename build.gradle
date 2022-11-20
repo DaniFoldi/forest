@@ -13,13 +13,26 @@ java {
     toolchain.languageVersion = JavaLanguageVersion.of(17)
 }
 
+compileJava {
+    options.compilerArgs << '-parameters'
+    options.fork = true
+    options.forkOptions.executable = 'javac'
+    options.release.set(17)
+}
+
 repositories {
     mavenCentral()
     maven { url 'https://repo.danifoldi.com/repository/maven-releases/' }
     maven { url 'https://repo.papermc.io/repository/maven-public/' }
     maven { url 'https://nexus.velocitypowered.com/repository/maven-public/' }
-    maven { url 'https://repo.viaversion.com' }
-    maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.fabricmc.net/' }
+    maven { url 'https://jitpack.io/' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url 'https://repo.viaversion.com/' }
+    maven { url 'https://maven.enginehub.org/repo/' }
+    maven { url 'https://ci.ender.zone/plugin/repository/everything/' }
+    maven { url 'https://repo.dmulloy2.net/repository/public/' }
+    maven { url 'https://mvn.exceptionflug.de/repository/exceptionflug-public/' }
 }
 
 dependencies {
