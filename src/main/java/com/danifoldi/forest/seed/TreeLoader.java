@@ -51,7 +51,7 @@ public class TreeLoader {
         }
     }
 
-    public CompletableFuture<Boolean> fetchTargets() {
+    public CompletableFuture<Boolean> fetchMetadata() {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 FileUtil.ensureDmlFile(Microbase.getDatafolder(), "targets.dml");

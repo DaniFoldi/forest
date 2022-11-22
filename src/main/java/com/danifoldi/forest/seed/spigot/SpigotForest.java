@@ -6,17 +6,15 @@ import com.danifoldi.microbase.Microbase;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.concurrent.Executors;
-
 @SuppressWarnings("unused")
 public class SpigotForest extends JavaPlugin {
 
-    private TreeLoader loader = new TreeLoader();
+    private final TreeLoader loader = new TreeLoader();
 
     @Override
     public void onEnable() {
-        Microbase.setup(Bukkit.getServer(), this, getDataFolder().toPath(), Executors.newCachedThreadPool(), MessageProvider::provide);
-        loader.fetchTargets();
+        Microbase.setup(Bukkit.getServer(), this, getDataFolder().toPath(), MessageProvider::provide);
+        loader.fetchMetadata();
         loader.preloadKnownTrees();
         loader.loadTargets();
     }

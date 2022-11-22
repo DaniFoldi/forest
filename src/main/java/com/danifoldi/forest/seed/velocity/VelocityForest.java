@@ -12,7 +12,6 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 
 import java.nio.file.Path;
-import java.util.concurrent.Executors;
 
 @Plugin(id = "forest",
         name = "Forest",
@@ -24,7 +23,7 @@ public class VelocityForest {
     private final Path datafolder;
     private final ProxyServer proxyServer;
 
-    private TreeLoader loader = new TreeLoader();
+    private final TreeLoader loader = new TreeLoader();
 
     @Inject
     public VelocityForest(@DataDirectory Path datafolder, ProxyServer proxyServer) {
@@ -34,8 +33,8 @@ public class VelocityForest {
 
     @Subscribe
     public void onInitialize(ProxyInitializeEvent event) {
-        Microbase.setup(proxyServer, this, datafolder, Executors.newCachedThreadPool(), MessageProvider::provide);
-        loader.fetchTargets();
+        Microbase.setup(proxyServer, this, datafolder, MessageProvider::provide);
+        loader.fetchMetadata();
         loader.preloadKnownTrees();
         loader.loadTargets();
     }
