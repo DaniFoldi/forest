@@ -55,6 +55,11 @@ task 'build-tree' {
     file('.').eachFileRecurse { f ->
         if (f.name.equalsIgnoreCase("${f.parentFile.name}Tree.java")) {
             def ver = ''
+            if (file('src/main/resources/trees').listFiles().find {
+                it.name.contains(f.parentFile.name)
+            } == null) {
+                throw new RuntimeException("Could not find dml file for tree ${f.parentFile.name}")
+            }
             file('src/main/resources/trees').listFiles().find {
                 it.name.contains(f.parentFile.name)
             }.readLines().each {
