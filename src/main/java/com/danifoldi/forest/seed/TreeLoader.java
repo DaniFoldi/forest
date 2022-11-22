@@ -3,6 +3,7 @@ package com.danifoldi.forest.seed;
 import com.danifoldi.dml.DmlParser;
 import com.danifoldi.dml.exception.DmlParseException;
 import com.danifoldi.dml.type.DmlArray;
+import com.danifoldi.dml.type.DmlObject;
 import com.danifoldi.microbase.Microbase;
 import com.danifoldi.microbase.util.FileUtil;
 
@@ -32,6 +33,12 @@ public class TreeLoader {
     private final Map<String, Set<String>> flattenedTargetDependencies = new ConcurrentHashMap<>();
     private final Map<String, TreeInfo> knownTrees = new ConcurrentHashMap<>();
 
+    private static String serverId = "";
+
+    public static String getServerId() {
+        return serverId;
+    }
+
 
     public void preloadKnownTrees() {
         for (Path jar: Microbase.getDatafolder().resolve("trees")) {
@@ -54,8 +61,10 @@ public class TreeLoader {
     public CompletableFuture<Boolean> fetchMetadata() {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                FileUtil.ensureDmlFile(Microbase.getDatafolder(), "targets.dml");
-                DmlArray values = DmlParser.parse(Microbase.getDatafolder().resolve("targets.dml")).asArray();
+                FileUtil.ensureDmlFile(Microbase.getDatafolder(), "metadata.dml");
+                DmlObject metadata = DmlParser.parse(Microbase.getDatafolder().resolve("metadata.dml")).asObject();
+                DmlArray values = metadata.getArray("targets");
+                serverId = metadata.getString("server").asString().value();
                 targets.clear();
                 targets.addAll(values.value().stream().map(v -> v.asString().value()).toList());
                 return true;
@@ -63,7 +72,7 @@ public class TreeLoader {
                 Microbase.logger.log(Level.SEVERE, e.getMessage());
                 return false;
             }
-        }, Microbase.getThreadPool());
+        }, Microbase.getThreadPool("forest"));
     }
 
     public CompletableFuture<Boolean> loadTree(String name) {
@@ -138,7 +147,7 @@ public class TreeLoader {
             tree.tree.load().join();
 
             return true;
-        }, Microbase.getThreadPool());
+        }, Microbase.getThreadPool("forest"));
     }
 
     public CompletableFuture<Boolean> unloadTree(String name, boolean force) {
@@ -164,7 +173,7 @@ public class TreeLoader {
             }
             return true;
 
-        }, Microbase.getThreadPool());
+        }, Microbase.getThreadPool("forest"));
     }
 
     public CompletableFuture<Boolean> loadTargets() {
