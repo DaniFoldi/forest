@@ -19,13 +19,13 @@ public class MessageTree implements Tree {
     @Override
     public @NotNull CompletableFuture<?> load() {
         return CompletableFuture.runAsync(() -> {
-            messages = DataVerse.getDataVerse().getNamespacedDataVerse(new DataverseNamespace(), "message", Message::new);
+            messages = DataVerse.getDataVerse().getNamespacedDataVerse(DataverseNamespace.get(), "message", Message::new);
             messages.list().thenAccept(m -> MessageProvider.update(m.stream().collect(Collectors.toMap(Pair::getFirst, p -> p.getSecond().value))));
-        }, Microbase.getThreadPool());
+        }, Microbase.getThreadPool("message"));
     }
 
     @Override
     public @NotNull CompletableFuture<@NotNull Boolean> unload(boolean force) {
-        return CompletableFuture.completedFuture(true);
+        return CompletableFuture.supplyAsync(() -> Microbase.shutdownThreadPool("message", 1000, force));
     }
 }

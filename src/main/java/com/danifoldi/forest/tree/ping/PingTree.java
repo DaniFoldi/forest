@@ -2,6 +2,8 @@ package com.danifoldi.forest.tree.ping;
 
 import com.danifoldi.forest.seed.Tree;
 import com.danifoldi.forest.tree.command.CommandTree;
+import com.danifoldi.microbase.BaseMessage;
+import com.danifoldi.microbase.BasePlayer;
 import com.danifoldi.microbase.BaseSender;
 import com.danifoldi.microbase.Microbase;
 import grapefruit.command.CommandContainer;
@@ -14,9 +16,7 @@ import java.util.concurrent.CompletableFuture;
 public class PingTree implements Tree, CommandContainer {
     @Override
     public @NotNull CompletableFuture<?> load() {
-        return CompletableFuture.runAsync(() -> {
-            CommandTree.registerCommands(this);
-        });
+        return CompletableFuture.runAsync(() -> CommandTree.registerCommands(this));
     }
 
     @Override
@@ -29,6 +29,12 @@ public class PingTree implements Tree, CommandContainer {
 
     @CommandDefinition(route = "ping", permission = "forest.ping.command.ping", runAsync = true)
     public void pingCommand(@Source BaseSender sender) {
-        sender.send(Microbase.baseMessage().providedText("command.ping.pong"));
+        BaseMessage message = Microbase.baseMessage().providedText("command.ping.pong");
+        if (sender instanceof BasePlayer player) {
+            message = message.replace("{ping}", String.valueOf(player.ping()));
+        } else {
+            message = message.replace("{ping}", Microbase.provideMessage("command.ping.consoleping"));
+        }
+        sender.send(message);
     }
 }

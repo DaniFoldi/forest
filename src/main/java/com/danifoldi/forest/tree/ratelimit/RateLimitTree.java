@@ -17,15 +17,15 @@ public class RateLimitTree implements Tree {
 
     @Override
     public @NotNull CompletableFuture<?> load() {
-        return CompletableFuture.runAsync(ratelimits::clear, Microbase.getThreadPool());
+        return CompletableFuture.runAsync(ratelimits::clear, Microbase.getThreadPool("ratelimit"));
     }
 
     @Override
     public @NotNull CompletableFuture<@NotNull Boolean> unload(boolean force) {
         return CompletableFuture.supplyAsync(() -> {
             ratelimits.clear();
-            return true;
-        }, Microbase.getThreadPool());
+            return Microbase.shutdownThreadPool("ratelimit", 1000, force);
+        });
     }
 
     public static boolean rateLimit(String key, Integer length, ChronoUnit unit) {
