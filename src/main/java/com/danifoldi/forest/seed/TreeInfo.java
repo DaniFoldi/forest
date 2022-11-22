@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -18,9 +19,9 @@ import java.util.stream.Collectors;
 public class TreeInfo {
     public String version;
     public Set<String> dependencies;
-    public ClassLoader classLoader;
-    public String className;
-    public String pack;
+    public final ClassLoader classLoader;
+    public final String className;
+    public final String pack;
     public Class<? extends Tree> treeClass;
     public Tree tree;
     public boolean loaded = false;
@@ -36,9 +37,9 @@ public class TreeInfo {
     public boolean makeTree() {
         try {
             treeClass = Class.forName(className, true, classLoader).asSubclass(Tree.class);
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(treeClass.getResourceAsStream("trees/%s.dml".formatted(pack))))) {
-                String dmlstring = reader.lines().collect(Collectors.joining("\n"));
-                DmlObject dml = DmlParser.parse(dmlstring).asObject();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(treeClass.getResourceAsStream("trees/%s.dml".formatted(pack)))))) {
+                String dmlString = reader.lines().collect(Collectors.joining("\n"));
+                DmlObject dml = DmlParser.parse(dmlString).asObject();
                 version = dml.get("version").toString();
                 dependencies = dml.get("dependencies").asArray().value().stream().map(v -> v.asString().value()).collect(Collectors.toSet());
             } catch (DmlParseException | IOException e) {
