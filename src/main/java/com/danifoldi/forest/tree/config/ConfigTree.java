@@ -15,14 +15,14 @@ import java.util.function.Supplier;
 
 public class ConfigTree implements Tree {
 
-    private final Map<String, NamespacedDataVerse<?>> dataverseCache = new ConcurrentHashMap<>();
+    private static final Map<String, NamespacedDataVerse<?>> dataverseCache = new ConcurrentHashMap<>();
 
     @Override
     public @NotNull CompletableFuture<?> load() {
         return CompletableFuture.runAsync(dataverseCache::clear);
     }
 
-    public <T> CompletableFuture<T> getConfigFor(String set, boolean global, Supplier<@NotNull T> objectSupplier) {
+    public static<T> CompletableFuture<T> getConfigFor(String set, boolean global, Supplier<@NotNull T> objectSupplier) {
         return CompletableFuture.supplyAsync(() -> {
             if (!dataverseCache.containsKey(set)) {
                 dataverseCache.put(set, DataVerse.getDataVerse().getNamespacedDataVerse(DataverseNamespace.get(), "config_%s".formatted(set), objectSupplier));
@@ -32,7 +32,7 @@ public class ConfigTree implements Tree {
         }, Microbase.getThreadPool("config"));
     }
 
-    public <T> CompletableFuture<?> setConfigFor(String set, boolean global, Supplier<@NotNull T> objectSupplier, T config) {
+    public static<T> CompletableFuture<?> setConfigFor(String set, boolean global, Supplier<@NotNull T> objectSupplier, T config) {
         return CompletableFuture.runAsync(() -> {
             if (!dataverseCache.containsKey(set)) {
                 dataverseCache.put(set, DataVerse.getDataVerse().getNamespacedDataVerse(DataverseNamespace.get(), "config_%s".formatted(set), objectSupplier));
