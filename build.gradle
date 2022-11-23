@@ -51,7 +51,7 @@ dependencies {
     implementation 'com.github.stefvanschie.inventoryframework:IF:0.10.5'
     compileOnly 'net.luckperms:api:5.4'
     compileOnly 'com.github.LeonMangler:PremiumVanishAPI:2.7.11-2'
-    compileOnly 'dev.simplix.plugins:punishcontrol-api:2.0.1'
+    compileOnly 'dev.simplix:protocolize-api:2.2.2'
     compileOnly 'me.lokka30:treasury-api:1.0.0'
 
     implementation 'javax.inject:javax.inject:1'
