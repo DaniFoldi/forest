@@ -24,7 +24,7 @@ repositories {
     maven { url 'https://repo.papermc.io/repository/maven-public/' }
     maven { url 'https://nexus.velocitypowered.com/repository/maven-public/' }
     maven { url 'https://maven.fabricmc.net/' }
-    maven { url 'https://repo.codemc.org/repository/maven-public' e}
+    maven { url 'https://repo.codemc.org/repository/maven-public' }
     maven { url 'https://jitpack.io/' }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://repo.viaversion.com/' }
