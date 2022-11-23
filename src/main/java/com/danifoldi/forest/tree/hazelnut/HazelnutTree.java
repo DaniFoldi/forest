@@ -5,9 +5,7 @@ import com.danifoldi.forest.seed.TreeLoader;
 import com.danifoldi.forest.tree.config.ConfigTree;
 import com.danifoldi.microbase.Microbase;
 import hazelnut.core.Hazelnut;
-import hazelnut.core.HazelnutBuilder;
 import hazelnut.core.Namespace;
-import hazelnut.core.config.HazelnutConfigBuilder;
 import hazelnut.redis.RedisMessageBusFactory;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +29,7 @@ public class HazelnutTree implements Tree {
                     .config(hazelnut.core.config.HazelnutConfig
                             .builder()
                             .cacheExpiryRate(config.cacheExpiryRate, TimeUnit.MILLISECONDS)
-                            .cacheHousekeeperRate(config.cacheHouskeeperRate, TimeUnit.MILLISECONDS)
+                            .cacheHousekeeperRate(config.cacheHousekeeperRate, TimeUnit.MILLISECONDS)
                             .heartbeatRate(config.heartbeatRate, TimeUnit.MILLISECONDS)
                             .build())
                     .busFactory(RedisMessageBusFactory
