@@ -47,12 +47,12 @@ dependencies {
     implementation 'com.danifoldi:DataVerse:0.4.2'
     implementation 'com.danifoldi:DML:1.0.2'
 
-    implementation 'com.cronutils:cron-utils:9.1.6'
-    implementation 'com.github.stefvanschie.inventoryframework:IF:0.10.5'
+    implementation 'com.cronutils:cron-utils:9.2.0'
+    implementation 'com.github.stefvanschie.inventoryframework:IF:0.10.7'
     compileOnly 'net.luckperms:api:5.4'
     compileOnly 'com.github.LeonMangler:PremiumVanishAPI:2.7.11-2'
     compileOnly 'dev.simplix:protocolize-api:2.2.2'
-    compileOnly 'me.lokka30:treasury-api:1.0.0'
+    compileOnly 'me.lokka30:treasury-api:1.2.1'
 
     implementation 'javax.inject:javax.inject:1'
     implementation 'com.google.dagger:dagger:2.44.2'
