@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
-@SuppressWarnings("unused")
 public class RateLimitTree implements Tree {
 
     private static final Map<String, Instant> ratelimits = new ConcurrentHashMap<>();
@@ -28,10 +27,13 @@ public class RateLimitTree implements Tree {
         });
     }
 
-    public boolean rateLimit(String key, Integer length, ChronoUnit unit) {
+    public boolean rateLimit(String key, long length, ChronoUnit unit) {
         Instant old = ratelimits.getOrDefault(key, Instant.MIN);
         Instant now = Instant.now();
-        ratelimits.put(key, now.plus(length, unit));
-        return old.isBefore(now);
+        boolean allow = old.isBefore(now);
+        if (allow) {
+            ratelimits.put(key, now.plus(length, unit));
+        }
+        return allow;
     }
 }
