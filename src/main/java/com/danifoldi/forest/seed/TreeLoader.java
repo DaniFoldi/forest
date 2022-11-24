@@ -31,7 +31,7 @@ public class TreeLoader {
     private final List<String> targets = Collections.synchronizedList(new ArrayList<>());
 
     private final Map<String, Set<String>> flattenedTargetDependencies = new ConcurrentHashMap<>();
-    private final Map<String, TreeInfo> knownTrees = new ConcurrentHashMap<>();
+    static final Map<String, TreeInfo> knownTrees = new ConcurrentHashMap<>();
 
     private static String serverId = "";
 
@@ -69,6 +69,7 @@ public class TreeLoader {
                 targets.addAll(values.value().stream().map(v -> v.asString().value()).toList());
                 return true;
             } catch (IOException | DmlParseException e) {
+                Microbase.logger.log(Level.SEVERE, "Could not load forest metadata");
                 Microbase.logger.log(Level.SEVERE, e.getMessage());
                 return false;
             }
