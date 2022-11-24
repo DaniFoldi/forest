@@ -13,7 +13,7 @@ public class GrownTrees {
         TreeInfo info = TreeLoader.knownTrees.get(lastPackage);
         if (info == null || !info.loaded) {
             Microbase.logger.log(Level.SEVERE, "Attempted to get tree %s with class %s".formatted(lastPackage, className));
-            return null;
+            throw new RuntimeException("Tree %s is not loaded".formatted(lastPackage));
         }
         //noinspection unchecked
         return (T)info.tree;

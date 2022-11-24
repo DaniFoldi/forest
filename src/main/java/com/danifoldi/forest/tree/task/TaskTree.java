@@ -19,7 +19,7 @@ public class TaskTree implements Tree {
         return null;
     }
 
-    public static void run(Task task) {
+    public void run(Task task) {
 
     }
 }

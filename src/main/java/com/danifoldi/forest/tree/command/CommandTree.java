@@ -39,11 +39,11 @@ public class CommandTree implements Tree {
         });
     }
 
-    public static void registerCommands(CommandContainer container) {
+    public void registerCommands(CommandContainer container) {
         dispatcher.registerCommands(container);
     }
 
-    public static void unregisterCommands(CommandContainer container) {
+    public void unregisterCommands(CommandContainer container) {
         // TODO implement once grapefruit supports unregistering commands
         Microbase.logger.log(Level.SEVERE, "unregisterCommands is currently not implemented");
     }

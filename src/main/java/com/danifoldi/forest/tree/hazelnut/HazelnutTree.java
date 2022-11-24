@@ -1,5 +1,6 @@
 package com.danifoldi.forest.tree.hazelnut;
 
+import com.danifoldi.forest.seed.GrownTrees;
 import com.danifoldi.forest.seed.Tree;
 import com.danifoldi.forest.seed.TreeLoader;
 import com.danifoldi.forest.tree.config.ConfigTree;
@@ -16,14 +17,14 @@ public class HazelnutTree implements Tree {
 
     private static Hazelnut hazelnutInstance;
 
-    public static Hazelnut getInstance() {
-        return getInstance();
+    public static Hazelnut getHazelnut() {
+        return hazelnutInstance;
     }
 
     @Override
     public @NotNull CompletableFuture<?> load() {
         return CompletableFuture.runAsync(() -> {
-            HazelnutConfig config = ConfigTree.getConfigFor("hazelnut", true, HazelnutConfig::new).join();
+            HazelnutConfig config = GrownTrees.get(ConfigTree.class).getConfigFor("hazelnut", true, HazelnutConfig::new).join();
             hazelnutInstance = Hazelnut.forIdentity(TreeLoader.getServerId())
                     .namespace(Namespace.of("hazelnut"))
                     .config(hazelnut.core.config.HazelnutConfig

@@ -6,6 +6,7 @@ import com.cronutils.model.time.ExecutionTime;
 import com.cronutils.parser.CronParser;
 import com.danifoldi.dataverse.DataVerse;
 import com.danifoldi.dataverse.data.NamespacedMultiDataVerse;
+import com.danifoldi.forest.seed.GrownTrees;
 import com.danifoldi.forest.seed.Tree;
 import com.danifoldi.forest.tree.config.ConfigTree;
 import com.danifoldi.forest.tree.dataverse.DataverseNamespace;
@@ -45,7 +46,7 @@ public class CronTree implements Tree {
     public @NotNull CompletableFuture<?> load() {
         return CompletableFuture.runAsync(() -> {
             NamespacedMultiDataVerse<CronTask> cronDataverse = DataVerse.getDataVerse().getNamespacedMultiDataVerse(DataverseNamespace.get(), "cron", CronTask::new);
-            CronConfig config = ConfigTree.getConfigFor("cron", true, CronConfig::new).join();
+            CronConfig config = GrownTrees.get(ConfigTree.class).getConfigFor("cron", true, CronConfig::new).join();
             if (config.catchupOnStartup) {
                 Microbase.getScheduler().runTaskAfter(() -> {
                     CompletableFuture.allOf(cronDataverse.list().join().stream().map(pair ->
@@ -63,7 +64,7 @@ public class CronTree implements Tree {
                                         cronDataverse.delete(pair.getFirst(), pair.getSecond()).join();
                                         pair.getSecond().lastRun = ExecutionTime.forCron(PARSER.parse(pair.getFirst())).lastExecution(Instant.now().atZone(ZoneId.systemDefault())).orElse(Instant.now().atZone(ZoneId.systemDefault())).toInstant();
                                         cronDataverse.add(pair.getFirst(), pair.getSecond()).join();
-                                        TaskTree.run(pair.getSecond());
+                                        GrownTrees.get(TaskTree.class).run(pair.getSecond());
                                     }
                                 }
                     })).toArray(CompletableFuture[]::new)).join();
@@ -82,7 +83,7 @@ public class CronTree implements Tree {
                     cronDataverse.delete(pair.getFirst(), pair.getSecond()).join();
                     pair.getSecond().lastRun = next.get().toInstant();
                     cronDataverse.add(pair.getFirst(), pair.getSecond()).join();
-                    TaskTree.run(pair.getSecond());
+                    GrownTrees.get(TaskTree.class).run(pair.getSecond());
                 }
             })).toArray(CompletableFuture[]::new)).join(), 20, TimeUnit.SECONDS);
         }, Microbase.getThreadPool("cron"));

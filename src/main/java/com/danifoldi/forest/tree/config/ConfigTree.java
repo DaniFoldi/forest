@@ -22,7 +22,7 @@ public class ConfigTree implements Tree {
         return CompletableFuture.runAsync(dataverseCache::clear);
     }
 
-    public static<T> CompletableFuture<T> getConfigFor(String set, boolean global, Supplier<@NotNull T> objectSupplier) {
+    public <T> CompletableFuture<T> getConfigFor(String set, boolean global, Supplier<@NotNull T> objectSupplier) {
         return CompletableFuture.supplyAsync(() -> {
             if (!dataverseCache.containsKey(set)) {
                 dataverseCache.put(set, DataVerse.getDataVerse().getNamespacedDataVerse(DataverseNamespace.get(), "config_%s".formatted(set), objectSupplier));
@@ -32,7 +32,7 @@ public class ConfigTree implements Tree {
         }, Microbase.getThreadPool("config"));
     }
 
-    public static<T> CompletableFuture<?> setConfigFor(String set, boolean global, Supplier<@NotNull T> objectSupplier, T config) {
+    public <T> CompletableFuture<?> setConfigFor(String set, boolean global, Supplier<@NotNull T> objectSupplier, T config) {
         return CompletableFuture.runAsync(() -> {
             if (!dataverseCache.containsKey(set)) {
                 dataverseCache.put(set, DataVerse.getDataVerse().getNamespacedDataVerse(DataverseNamespace.get(), "config_%s".formatted(set), objectSupplier));

@@ -28,7 +28,7 @@ public class RateLimitTree implements Tree {
         });
     }
 
-    public static boolean rateLimit(String key, Integer length, ChronoUnit unit) {
+    public boolean rateLimit(String key, Integer length, ChronoUnit unit) {
         Instant old = ratelimits.getOrDefault(key, Instant.MIN);
         Instant now = Instant.now();
         ratelimits.put(key, now.plus(length, unit));
