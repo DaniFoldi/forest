@@ -1,0 +1,2 @@
+version: '1.0.0'
+dependencies: [ 'task>=1.0.0', 'config>=1.0.0', 'dataverse>=1.0.0' ]
