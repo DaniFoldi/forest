@@ -1,0 +1,2 @@
+version: '1.0.0'
+dependencies: [ 'ratelimit>=1.0.0' ]
