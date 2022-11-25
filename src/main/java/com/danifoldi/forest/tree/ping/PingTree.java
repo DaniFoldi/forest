@@ -2,6 +2,8 @@ package com.danifoldi.forest.tree.ping;
 
 import com.danifoldi.forest.seed.GrownTrees;
 import com.danifoldi.forest.seed.Tree;
+import com.danifoldi.forest.seed.collector.collector.CommandCollector;
+import com.danifoldi.forest.seed.collector.collector.PermissionCollector;
 import com.danifoldi.forest.tree.command.CommandTree;
 import com.danifoldi.microbase.BaseMessage;
 import com.danifoldi.microbase.BasePlayer;
@@ -28,6 +30,8 @@ public class PingTree implements Tree, CommandContainer {
         });
     }
 
+    @CommandCollector("ping")
+    @PermissionCollector("forest.ping.command.ping")
     @CommandDefinition(route = "ping", permission = "forest.ping.command.ping", runAsync = true)
     public void pingCommand(@Source BaseSender sender) {
         BaseMessage message = Microbase.baseMessage().providedText("command.ping.pong");
