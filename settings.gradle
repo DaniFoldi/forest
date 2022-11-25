@@ -1,2 +1,3 @@
 rootProject.name = 'forest'
+include 'collector'
 
