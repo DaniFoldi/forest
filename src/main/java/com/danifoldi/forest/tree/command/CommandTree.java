@@ -1,7 +1,10 @@
 package com.danifoldi.forest.tree.command;
 
+import com.danifoldi.dataverse.DataVerse;
+import com.danifoldi.dataverse.data.NamespacedMultiDataVerse;
 import com.danifoldi.forest.seed.MessageProvider;
 import com.danifoldi.forest.seed.Tree;
+import com.danifoldi.forest.tree.dataverse.DataverseNamespace;
 import com.danifoldi.microbase.BaseSender;
 import com.danifoldi.microbase.Microbase;
 import com.google.common.reflect.TypeToken;
@@ -14,21 +17,23 @@ import java.util.logging.Level;
 
 public class CommandTree implements Tree {
 
-    static CommandDispatcher<BaseSender> dispatcher;
+    CommandDispatcher<BaseSender> dispatcher;
+    NamespacedMultiDataVerse<CommandConfig> commandDataverse;
 
     @Override
     public @NotNull CompletableFuture<?> load() {
         return CompletableFuture.runAsync(() -> {
+            commandDataverse = DataVerse.getDataVerse().getNamespacedMultiDataVerse(DataverseNamespace.get(), "command_alias", CommandConfig::new);
             //noinspection UnstableApiUsage
             dispatcher = CommandDispatcher.builder(TypeToken.of(BaseSender.class))
                     .withAuthorizer(BaseSender::hasPermission)
                     .withMessenger(BaseSender::send)
                     .withMessageProvider(key -> MessageProvider.provide(key.key()))
                     .withAsyncExecutor(Microbase.getThreadPool("command"))
-                    .withRegistrationHandler(new CommandRegistrationHandler())
+                    .withRegistrationHandler(new CommandRegistrationHandler(commandDataverse))
                     .build();
             dispatcher.mappers().registerMapper(new CommandPlayerMapper());
-        });
+        }, Microbase.getThreadPool("command"));
     }
 
     @Override
