@@ -1,9 +1,6 @@
 package com.danifoldi.forest.tree.task;
 
-import hazelnut.core.Message;
-import org.jetbrains.annotations.NotNull;
-
-public class Task implements Message<Task> {
+public class Task {
     public String type;
     public String value;
 
@@ -14,10 +11,5 @@ public class Task implements Message<Task> {
 
     public Task() {
 
-    }
-
-    @Override
-    public @NotNull Class<Task> type() {
-        return Task.class;
     }
 }
