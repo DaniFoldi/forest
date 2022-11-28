@@ -4,10 +4,13 @@ import com.danifoldi.forest.seed.GrownTrees;
 import com.danifoldi.forest.seed.Tree;
 import com.danifoldi.forest.seed.collector.collector.CommandCollector;
 import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
+import com.danifoldi.forest.seed.collector.collector.MessageCollector;
 import com.danifoldi.forest.seed.collector.collector.PermissionCollector;
 import com.danifoldi.forest.seed.collector.collector.VersionCollector;
+import com.danifoldi.forest.tree.config.ConfigTree;
 import com.danifoldi.forest.tree.hazelnut.HazelnutTree;
 import com.danifoldi.forest.tree.task.Task;
+import com.danifoldi.microbase.BasePlayer;
 import com.danifoldi.microbase.BaseSender;
 import com.danifoldi.microbase.BaseServer;
 import com.danifoldi.microbase.Microbase;
@@ -28,6 +31,9 @@ import java.util.concurrent.CompletableFuture;
 @DependencyCollector(tree="hazelnut", minVersion="1.0.0")
 @DependencyCollector(tree="task", minVersion="1.0.0")
 public class RemoteTree implements Tree {
+
+    RemoteConfig config;
+
     @Override
     public @NotNull CompletableFuture<?> load() {
         return CompletableFuture.runAsync(() -> {
@@ -49,6 +55,9 @@ public class RemoteTree implements Tree {
                     return new Task(intermediary.getString("type", ""), intermediary.getString("value", ""));
                 }
             });
+            GrownTrees.get(ConfigTree.class).getConfigFor("remote", true, RemoteConfig::new).thenAcceptAsync(config -> {
+                this.config = config;
+            }, Microbase.getThreadPool("remote"));
         }, Microbase.getThreadPool("remote"));
     }
 
@@ -63,10 +72,20 @@ public class RemoteTree implements Tree {
 
     @CommandCollector("remotecommand")
     @CommandCollector("remote")
+    @MessageCollector("remote.invalidKey")
     @PermissionCollector("forest.remote.remote")
     @Redirect(from = "/remotecommand", arguments = {"console"})
     @CommandDefinition(route = "/remote", permission = "forest.remote.remote", runAsync = true)
-    public void onRemoteCommand(@Source BaseSender source, String type, BaseServer target, @Greedy String value) {
+    public void onRemoteCommand(@Source BaseSender source, String type, BaseServer target, String key, @Greedy String value) {
+        if (source.isPlayer()) {
+            if (!key.equals(config.key)) {
+                source.send(Microbase.baseMessage().providedText("remote.invalidKey"));
+                return;
+            }
+        } else {
+            value = "%s %s".formatted(key, value);
+        }
 
+        sendTask(new Task(type, value), target.name());
     }
 }
