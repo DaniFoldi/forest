@@ -8,18 +8,14 @@ import grapefruit.command.dispatcher.registration.CommandRegistrationContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.stream.Stream;
 
 public class CommandRegistrationHandler implements grapefruit.command.dispatcher.registration.CommandRegistrationHandler<BaseSender> {
 
-    private NamespacedMultiDataVerse<CommandConfig> commandDataverse;
+    private final NamespacedMultiDataVerse<CommandConfig> commandDataverse;
 
     public CommandRegistrationHandler(NamespacedMultiDataVerse<CommandConfig> commandDataverse) {
         this.commandDataverse = commandDataverse;

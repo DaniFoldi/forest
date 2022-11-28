@@ -15,9 +15,9 @@ import java.util.concurrent.TimeUnit;
 
 public class HazelnutTree implements Tree {
 
-    private static Hazelnut hazelnutInstance;
+    private Hazelnut hazelnutInstance;
 
-    public static Hazelnut getHazelnut() {
+    public Hazelnut getHazelnut() {
         return hazelnutInstance;
     }
 

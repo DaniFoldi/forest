@@ -9,7 +9,7 @@ public class DataverseNamespace implements Namespaced {
         return instance;
     }
 
-    private static DataverseNamespace instance = new DataverseNamespace();
+    private static final DataverseNamespace instance = new DataverseNamespace();
 
     @Override
     public @NotNull String getNamespace() {

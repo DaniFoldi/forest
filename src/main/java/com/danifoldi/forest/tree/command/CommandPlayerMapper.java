@@ -1,5 +1,6 @@
 package com.danifoldi.forest.tree.command;
 
+import com.danifoldi.forest.seed.collector.collector.MessageCollector;
 import com.danifoldi.microbase.BasePlayer;
 import com.danifoldi.microbase.BaseSender;
 import com.danifoldi.microbase.Microbase;
@@ -27,6 +28,7 @@ public class CommandPlayerMapper implements ParameterMapper<BaseSender, BasePlay
     }
 
     @Override
+    @MessageCollector(value = "command.playerNotFound", replacements = {"{player}"})
     public @NotNull BasePlayer map(@NotNull CommandContext<BaseSender> context, @NotNull Queue<CommandInput> args, @NotNull AnnotationList modifiers) throws ParameterMappingException {
         String input = args.element().rawArg();
         return Optional.ofNullable(Microbase.getPlatform().getPlayer(input)).orElseThrow(
