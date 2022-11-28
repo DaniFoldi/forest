@@ -40,20 +40,33 @@ dependencies {
     compileOnly 'com.velocitypowered:velocity-api:3.1.1'
     annotationProcessor 'com.velocitypowered:velocity-api:3.1.1'
 
-    implementation 'grapefruit:grapefruit:1.5.0'
-    implementation 'hazelnut:redis:0.0.1'
+    compileOnly 'net.kyori:adventure-platform-bungeecord:4.1.2'
+
+    implementation ('grapefruit:grapefruit:1.5.0') {
+        exclude module: 'guava'
+    }
+    implementation ('hazelnut:redis:0.0.1') {
+        exclude module: 'slf4j-api'
+        exclude module: 'json'
+        exclude module: 'gson'
+    }
     implementation 'com.danifoldi:microbase:0.5.0'
     compileOnly 'com.danifoldi:DataVerse:0.4.2'
     implementation 'com.danifoldi:DML:1.0.2'
 
-    implementation 'com.cronutils:cron-utils:9.2.0'
+    implementation ('com.cronutils:cron-utils:9.2.0') {
+        exclude module: 'slf4j-api'
+    }
     implementation 'com.github.stefvanschie.inventoryframework:IF:0.10.7'
     compileOnly 'net.luckperms:api:5.4'
-    compileOnly 'com.github.LeonMangler:PremiumVanishAPI:2.7.11-2'
+    compileOnly ('com.github.LeonMangler:PremiumVanishAPI:2.7.11-2') {
+        exclude module: 'jsr305'
+    }
     compileOnly 'dev.simplix:protocolize-api:2.2.2'
-    compileOnly 'me.lokka30:treasury-api:1.2.1'
+    compileOnly ('me.lokka30:treasury-api:1.2.1') {
+        exclude module: 'annotations'
+    }
 
-    implementation 'javax.inject:javax.inject:1'
     implementation 'com.google.dagger:dagger:2.44.2'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.44.2'
 
@@ -67,23 +80,7 @@ task 'build-tree' {
 
     file('.').eachFileRecurse { f ->
         if (f.name.equalsIgnoreCase("${f.parentFile.name}Tree.java")) {
-            def ver = ''
-            if (file('src/main/resources/trees').listFiles().find {
-                it.name.contains(f.parentFile.name)
-            } == null) {
-                throw new RuntimeException("Could not find dml file for tree ${f.parentFile.name}")
-            }
-            file('src/main/resources/trees').listFiles().find {
-                it.name.contains(f.parentFile.name)
-            }.readLines().each {
-                it.eachMatch(/version: '\d+\.\d+\.\d+'/) {
-                    ver = (it =~ /\d+\.\d+\.\d+/)[0]
-                }
-            }
 
-            if (ver == "") {
-                throw new RuntimeException("Failed to parse version of ${f.parentFile.name}")
-            }
             try {
                 tasks.getByName("build-tree-${f.parentFile.name}")
                 return
@@ -97,11 +94,11 @@ task 'build-tree' {
                 minimize()
                 include "com/danifoldi/forest/tree/${f.parentFile.name}/*"
                 include "trees/${f.parentFile.name}.dml"
-                include "trees/${f.parentFile.name}-collected.dml"
                 dependencies {
                     exclude(dependency('*:*:*'))
                 }
-                archiveFileName = "forest-${f.parentFile.name}-${ver}.jar"
+                // TODO find a way to add version to file name
+                archiveFileName = "forest-${f.parentFile.name}.jar"
                 configurations = []
             }
             tasks.build.dependsOn("build-tree-${f.parentFile.name}")
@@ -138,6 +135,8 @@ shadowJar {
     relocate 'redis.clients.jedis', 'com.danifoldi.forest.lib.redis'
     relocate 'org.apache.commons.pool2', 'com.danifoldi.forest.lib.pool2'
     relocate 'com.cronutils', 'com.danifoldi.forest.lib.cronutils'
+    relocate 'com.eclipsesource.json', 'com.danifoldi.forest.lib.json'
+    relocate 'com.danifoldi.dml', 'com.danifoldi.forest.lib.dml'
 
     archiveFileName = "forest-${project.version}.jar"
 }
