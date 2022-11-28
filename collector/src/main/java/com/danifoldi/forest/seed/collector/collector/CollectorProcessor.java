@@ -17,6 +17,7 @@ import javax.tools.StandardLocation;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -39,10 +40,13 @@ public class CollectorProcessor extends AbstractProcessor {
                 DmlArray commands = new DmlArray(new ArrayList<>());
                 DmlArray messages = new DmlArray(new ArrayList<>());
                 DmlArray permissions = new DmlArray(new ArrayList<>());
+                DmlArray dependencies = new DmlArray(new ArrayList<>());
                 DmlObject out = new DmlObject(new HashMap<>());
                 out.set("commands", commands);
                 out.set("messages", messages);
                 out.set("permissions", permissions);
+                out.set("dependencies", dependencies);
+                out.set("version", new DmlString("0.0.0"));
                 collected.put(treeName, out);
             }
             return collected.get(treeName);
@@ -50,11 +54,21 @@ public class CollectorProcessor extends AbstractProcessor {
 
         try {
             for (TypeElement annotation : annotations) {
-                switch (annotation.getSimpleName().toString()) {
+                switch (annotation.getSimpleName().toString().replaceFirst("^Multi", "")) {
                     case "CommandCollector":
                         for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
                             for (CommandCollector c: element.getAnnotationsByType(CommandCollector.class)) {
                                 collectForTree.apply(element).get("commands").asArray().add(new DmlString(c.value()));
+                            }
+                        }
+                        break;
+                    case "DependencyCollector":
+                        for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
+                            for (DependencyCollector d: element.getAnnotationsByType(DependencyCollector.class)) {
+                                DmlObject dependency = new DmlObject(new HashMap<>());
+                                dependency.set("tree", new DmlString(d.tree()));
+                                dependency.set("minVersion", new DmlString(d.minVersion()));
+                                collectForTree.apply(element).get("messages").asArray().add(dependency);
                             }
                         }
                         break;
@@ -64,6 +78,7 @@ public class CollectorProcessor extends AbstractProcessor {
                                 DmlObject message = new DmlObject(new HashMap<>());
                                 message.set("template", new DmlString(m.value()));
                                 DmlArray replacements = new DmlArray(new ArrayList<>());
+                                Arrays.stream(m.replacements()).forEach(r -> replacements.add(new DmlString(r)));
                                 message.set("replacements", replacements);
                                 collectForTree.apply(element).get("messages").asArray().add(message);
                             }
@@ -76,10 +91,17 @@ public class CollectorProcessor extends AbstractProcessor {
                             }
                         }
                         break;
+                    case "VersionCollector":
+                        for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
+                            for (VersionCollector v: element.getAnnotationsByType(VersionCollector.class)) {
+                                collectForTree.apply(element).get("version").asString().value(v.value());
+                            }
+                        }
+                        break;
                 }
             }
             for (Map.Entry<String, DmlObject> tree: collected.entrySet()) {
-                FileObject file = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", "trees/%s-collected.dml".formatted(tree.getKey()));
+                FileObject file = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", "trees/%s.dml".formatted(tree.getKey()));
                 try (BufferedWriter writer = new BufferedWriter(file.openWriter())) {
                     writer.write(DmlSerializer.serialize(tree.getValue()));
                 }
