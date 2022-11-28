@@ -33,6 +33,7 @@ public class CommandTree implements Tree {
                     .withRegistrationHandler(new CommandRegistrationHandler(commandDataverse))
                     .build();
             dispatcher.mappers().registerMapper(new CommandPlayerMapper());
+            dispatcher.mappers().registerMapper(new CommandServerMapper());
         }, Microbase.getThreadPool("command"));
     }
 
