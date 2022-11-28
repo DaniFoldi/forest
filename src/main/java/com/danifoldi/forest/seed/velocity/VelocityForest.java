@@ -7,6 +7,7 @@ import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
+import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -17,6 +18,14 @@ import java.nio.file.Path;
         name = "Forest",
         version = "@version@",
         description = "Forest is a module system of Trees (microservices)",
+        dependencies = {
+                @Dependency(id = "dataverse", optional = true),
+                @Dependency(id = "luckperms", optional = true),
+                @Dependency(id = "premiumvanish", optional = true),
+                @Dependency(id = "protocolize", optional = true),
+                @Dependency(id = "protogui", optional = true),
+                @Dependency(id = "viaversion", optional = true)
+        },
         authors = {"DaniFoldi"})
 public class VelocityForest {
 
