@@ -5,6 +5,8 @@ import com.danifoldi.dataverse.data.NamespacedDataVerse;
 import com.danifoldi.dataverse.util.Pair;
 import com.danifoldi.forest.seed.MessageProvider;
 import com.danifoldi.forest.seed.Tree;
+import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
+import com.danifoldi.forest.seed.collector.collector.VersionCollector;
 import com.danifoldi.forest.tree.dataverse.DataverseNamespace;
 import com.danifoldi.microbase.Microbase;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+@VersionCollector("1.0.0")
+@DependencyCollector(tree="dataverse", minVersion="1.0.0")
 public class MessageTree implements Tree {
 
     public NamespacedDataVerse<Message> messages;

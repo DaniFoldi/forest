@@ -1,6 +1,8 @@
 package com.danifoldi.forest.tree.listener;
 
 import com.danifoldi.forest.seed.Tree;
+import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
+import com.danifoldi.forest.seed.collector.collector.VersionCollector;
 import com.danifoldi.microbase.Microbase;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
@@ -10,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
+@VersionCollector("1.0.0")
 public class ListenerTree implements Tree {
 
     private Object listener;

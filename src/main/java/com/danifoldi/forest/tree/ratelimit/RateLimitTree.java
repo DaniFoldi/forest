@@ -1,6 +1,8 @@
 package com.danifoldi.forest.tree.ratelimit;
 
 import com.danifoldi.forest.seed.Tree;
+import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
+import com.danifoldi.forest.seed.collector.collector.VersionCollector;
 import com.danifoldi.microbase.Microbase;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,6 +12,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+@VersionCollector("1.0.0")
 public class RateLimitTree implements Tree {
 
     private static final Map<String, Instant> ratelimits = new ConcurrentHashMap<>();

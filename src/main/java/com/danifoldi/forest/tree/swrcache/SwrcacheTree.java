@@ -2,6 +2,8 @@ package com.danifoldi.forest.tree.swrcache;
 
 import com.danifoldi.forest.seed.GrownTrees;
 import com.danifoldi.forest.seed.Tree;
+import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
+import com.danifoldi.forest.seed.collector.collector.VersionCollector;
 import com.danifoldi.forest.tree.ratelimit.RateLimitTree;
 import com.danifoldi.microbase.Microbase;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +14,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
+@VersionCollector("1.0.0")
+@DependencyCollector(tree="ratelimit", minVersion="1.0.0")
 public class SwrcacheTree implements Tree {
 
     private static final Map<String, Object> cache = new ConcurrentHashMap<>();

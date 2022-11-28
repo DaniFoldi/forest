@@ -4,6 +4,8 @@ import com.danifoldi.dataverse.DataVerse;
 import com.danifoldi.dataverse.data.NamespacedDataVerse;
 import com.danifoldi.forest.seed.Tree;
 import com.danifoldi.forest.seed.TreeLoader;
+import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
+import com.danifoldi.forest.seed.collector.collector.VersionCollector;
 import com.danifoldi.forest.tree.dataverse.DataverseNamespace;
 import com.danifoldi.microbase.Microbase;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +15,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
+@VersionCollector("1.0.0")
+@DependencyCollector(tree="message", minVersion="1.0.0")
 public class ConfigTree implements Tree {
 
     private static final Map<String, NamespacedDataVerse<?>> dataverseCache = new ConcurrentHashMap<>();

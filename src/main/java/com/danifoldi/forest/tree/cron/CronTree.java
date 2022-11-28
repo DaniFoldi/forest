@@ -8,6 +8,8 @@ import com.danifoldi.dataverse.DataVerse;
 import com.danifoldi.dataverse.data.NamespacedMultiDataVerse;
 import com.danifoldi.forest.seed.GrownTrees;
 import com.danifoldi.forest.seed.Tree;
+import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
+import com.danifoldi.forest.seed.collector.collector.VersionCollector;
 import com.danifoldi.forest.tree.config.ConfigTree;
 import com.danifoldi.forest.tree.dataverse.DataverseNamespace;
 import com.danifoldi.forest.tree.task.TaskTree;
@@ -22,6 +24,10 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+@VersionCollector("1.0.0")
+@DependencyCollector(tree="config", minVersion="1.0.0")
+@DependencyCollector(tree="dataverse", minVersion="1.0.0")
+@DependencyCollector(tree="task", minVersion="1.0.0")
 public class CronTree implements Tree {
 
     private static BaseScheduler.BaseTask cronTask;

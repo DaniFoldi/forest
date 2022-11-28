@@ -4,6 +4,8 @@ import com.danifoldi.dataverse.DataVerse;
 import com.danifoldi.dataverse.data.NamespacedMultiDataVerse;
 import com.danifoldi.forest.seed.MessageProvider;
 import com.danifoldi.forest.seed.Tree;
+import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
+import com.danifoldi.forest.seed.collector.collector.VersionCollector;
 import com.danifoldi.forest.tree.dataverse.DataverseNamespace;
 import com.danifoldi.microbase.BaseSender;
 import com.danifoldi.microbase.Microbase;
@@ -15,6 +17,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
+@VersionCollector("1.0.0")
+@DependencyCollector(tree="config", minVersion="1.0.0")
+@DependencyCollector(tree="message", minVersion="1.0.0")
 public class CommandTree implements Tree {
 
     CommandDispatcher<BaseSender> dispatcher;
