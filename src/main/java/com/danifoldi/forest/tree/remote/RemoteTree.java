@@ -66,7 +66,7 @@ public class RemoteTree implements Tree {
         return CompletableFuture.supplyAsync(() -> Microbase.shutdownThreadPool("remote", 1000, force));
     }
 
-    public void sendTask(Task task, String target) {
+    public void sendTask(RemoteTask task, String target) {
         GrownTrees.get(HazelnutTree.class).getHazelnut().to(target).send(task);
     }
 
@@ -86,6 +86,6 @@ public class RemoteTree implements Tree {
             value = "%s %s".formatted(key, value);
         }
 
-        sendTask(new Task(type, value), target.name());
+        sendTask(new RemoteTask(type, value), target.name());
     }
 }
