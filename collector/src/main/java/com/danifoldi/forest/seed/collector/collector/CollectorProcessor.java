@@ -40,11 +40,13 @@ public class CollectorProcessor extends AbstractProcessor {
                 DmlArray commands = new DmlArray(new ArrayList<>());
                 DmlArray messages = new DmlArray(new ArrayList<>());
                 DmlArray permissions = new DmlArray(new ArrayList<>());
+                DmlArray platforms = new DmlArray(new ArrayList<>());
                 DmlArray dependencies = new DmlArray(new ArrayList<>());
                 DmlObject out = new DmlObject(new HashMap<>());
                 out.set("commands", commands);
                 out.set("messages", messages);
                 out.set("permissions", permissions);
+                out.set("platforms", platforms);
                 out.set("dependencies", dependencies);
                 out.set("version", new DmlString("0.0.0"));
                 collected.put(treeName, out);
@@ -88,6 +90,13 @@ public class CollectorProcessor extends AbstractProcessor {
                         for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
                             for (PermissionCollector p: element.getAnnotationsByType(PermissionCollector.class)) {
                                 collectForTree.apply(element).get("permissions").asArray().add(new DmlString(p.value()));
+                            }
+                        }
+                        break;
+                    case "PlatformCollector":
+                        for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
+                            for (PlatformCollector p: element.getAnnotationsByType(PlatformCollector.class)) {
+                                collectForTree.apply(element).get("platforms").asArray().add(new DmlString(p.value()));
                             }
                         }
                         break;
