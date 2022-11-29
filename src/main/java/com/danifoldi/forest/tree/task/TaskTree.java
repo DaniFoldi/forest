@@ -4,6 +4,7 @@ import com.danifoldi.dataverse.DataVerse;
 import com.danifoldi.dataverse.data.NamespacedMultiDataVerse;
 import com.danifoldi.forest.seed.GrownTrees;
 import com.danifoldi.forest.seed.Tree;
+import com.danifoldi.forest.seed.TreeLoader;
 import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
 import com.danifoldi.forest.seed.collector.collector.VersionCollector;
 import com.danifoldi.forest.tree.dataverse.DataverseNamespace;
@@ -88,7 +89,7 @@ public class TaskTree implements Tree {
                 }
             }, Microbase.getThreadPool("task")));
 
-            taskDataverse = DataVerse.getDataVerse().getNamespacedMultiDataVerse(DataverseNamespace.get(), "task_queue", Task::new);
+            taskDataverse = DataVerse.getDataVerse().getNamespacedMultiDataVerse(DataverseNamespace.get(), "task_queue_%s".formatted(TreeLoader.getServerId()), Task::new);
             GrownTrees.get(ListenerTree.class).addListener(TaskTree.class, ForestJoinEvent.class, event -> {
                 taskDataverse.get(event.playerName().toLowerCase(Locale.ROOT)).thenAcceptAsync(tasks -> {
                     for (Task task: tasks) {
