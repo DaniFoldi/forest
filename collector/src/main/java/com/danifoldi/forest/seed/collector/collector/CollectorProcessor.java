@@ -70,7 +70,7 @@ public class CollectorProcessor extends AbstractProcessor {
                                 DmlObject dependency = new DmlObject(new HashMap<>());
                                 dependency.set("tree", new DmlString(d.tree()));
                                 dependency.set("minVersion", new DmlString(d.minVersion()));
-                                collectForTree.apply(element).get("messages").asArray().add(dependency);
+                                collectForTree.apply(element).get("dependencies").asArray().add(dependency);
                             }
                         }
                         break;
