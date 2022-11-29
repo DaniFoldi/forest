@@ -1,7 +1,6 @@
 package com.danifoldi.forest.tree.ratelimit;
 
 import com.danifoldi.forest.seed.Tree;
-import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
 import com.danifoldi.forest.seed.collector.collector.VersionCollector;
 import com.danifoldi.microbase.Microbase;
 import org.jetbrains.annotations.NotNull;

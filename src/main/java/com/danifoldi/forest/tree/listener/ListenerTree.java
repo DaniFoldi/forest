@@ -1,7 +1,6 @@
 package com.danifoldi.forest.tree.listener;
 
 import com.danifoldi.forest.seed.Tree;
-import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
 import com.danifoldi.forest.seed.collector.collector.VersionCollector;
 import com.danifoldi.microbase.Microbase;
 import com.google.common.collect.Multimap;

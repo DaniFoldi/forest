@@ -1,8 +1,6 @@
 package com.danifoldi.forest.tree.logger;
 
 import com.danifoldi.dataverse.data.NamespacedMultiDataVerse;
-import com.danifoldi.dataverse.database.mysql.MySQLDataVerse;
-import com.danifoldi.dataverse.lib.mongodb.internal.build.MongoDriverVersion;
 import com.danifoldi.forest.seed.TreeLoader;
 import com.danifoldi.microbase.Microbase;
 

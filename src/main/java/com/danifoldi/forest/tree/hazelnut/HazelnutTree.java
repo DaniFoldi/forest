@@ -3,7 +3,6 @@ package com.danifoldi.forest.tree.hazelnut;
 import com.danifoldi.forest.seed.GrownTrees;
 import com.danifoldi.forest.seed.Tree;
 import com.danifoldi.forest.seed.TreeLoader;
-import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
 import com.danifoldi.forest.seed.collector.collector.VersionCollector;
 import com.danifoldi.forest.tree.config.ConfigTree;
 import com.danifoldi.microbase.Microbase;
