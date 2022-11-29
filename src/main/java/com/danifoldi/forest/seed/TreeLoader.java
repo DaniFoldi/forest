@@ -5,6 +5,7 @@ import com.danifoldi.dml.exception.DmlParseException;
 import com.danifoldi.dml.type.DmlArray;
 import com.danifoldi.dml.type.DmlObject;
 import com.danifoldi.microbase.Microbase;
+import com.danifoldi.microbase.MicrobasePlatformType;
 import com.danifoldi.microbase.util.FileUtil;
 
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class TreeLoader {
                     knownTrees.put(pack, new TreeInfo(loader, "com.danifoldi.forest.tree.%s.%sTree".formatted(pack, clazz), pack));
                 }
             } catch (MalformedURLException e) {
-                Microbase.logger.log(Level.WARNING, "Could not load %s url".formatted(jar.getFileName().toString()));
+                Microbase.logger.log(Level.SEVERE, "Could not load %s url".formatted(jar.getFileName().toString()));
             }
         }
     }
@@ -118,6 +119,10 @@ public class TreeLoader {
         }
     }
 
+    public boolean supportsPlatform(Set<String> supported, MicrobasePlatformType platformType) {
+        return supported.isEmpty() || supported.stream().anyMatch(platformType.name()::equalsIgnoreCase);
+    }
+
     public CompletableFuture<Boolean> loadTree(String name, String versionRequirement) {
         return CompletableFuture.supplyAsync(() -> {
             if (!knownTrees.containsKey(name)) {
@@ -128,6 +133,11 @@ public class TreeLoader {
             TreeInfo tree = knownTrees.get(name);
             if (!versionMatches(tree.version, versionRequirement)) {
                 Microbase.logger.log(Level.SEVERE, "Tree %s has version %s which is not compatible with %s".formatted(name, tree.version, versionRequirement));
+                return false;
+            }
+
+            if (!supportsPlatform(tree.platforms, Microbase.platformType)) {
+                Microbase.logger.log(Level.SEVERE, "Tree %s only supports platforms %s, but was loaded on %s".formatted(name, String.join(",", tree.platforms), Microbase.platformType.name()));
                 return false;
             }
 
