@@ -51,7 +51,7 @@ dependencies {
         exclude module: 'gson'
     }
     implementation 'com.danifoldi:microbase:0.5.0'
-    compileOnly 'com.danifoldi:DataVerse:0.4.2'
+    compileOnly 'com.danifoldi:DataVerse:0.5.0'
     implementation 'com.danifoldi:DML:1.0.2'
 
     implementation ('com.cronutils:cron-utils:9.2.0') {
@@ -93,6 +93,11 @@ task 'build-tree' {
                 from sourceSets.main.output
                 minimize()
                 include "com/danifoldi/forest/tree/${f.parentFile.name}/*"
+
+                if (f.parentFile.name == 'gameprotocol') {
+                    include 'protocols.dml'
+                }
+
                 include "trees/${f.parentFile.name}.dml"
                 dependencies {
                     exclude(dependency('*:*:*'))
@@ -125,6 +130,7 @@ shadowJar {
     minimize()
     exclude 'com/danifoldi/forest/tree/*'
     exclude 'trees/*.dml'
+    exclude 'protocols.dml'
 
     relocate 'org.jetbrains.annotations', 'com.danifoldi.forest.lib.annotations'
     relocate 'javax.inject', 'com.danifoldi.forest.lib.inject'
