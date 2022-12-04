@@ -141,8 +141,8 @@ public class TreeLoader {
                 return false;
             }
 
-            for (String dependency: knownTrees.get(name).dependencies) {
-                if (!loadTree(dependency).join()) {
+            for (Map.Entry<String, String> dependency: knownTrees.get(name).dependencies.entrySet()) {
+                if (!loadTree(dependency.getKey(), dependency.getValue()).join()) {
                     return false;
                 }
             }
@@ -177,7 +177,7 @@ public class TreeLoader {
                 return false;
             }
 
-            for (String dependency: knownTrees.get(name).dependencies) {
+            for (String dependency: knownTrees.get(name).dependencies.keySet()) {
                 if (!unloadTree(dependency, force).join()) {
                     return false;
                 }
@@ -211,7 +211,7 @@ public class TreeLoader {
 
     private void addDependenciesOf(String name, String toTarget) {
         if (flattenedTargetDependencies.get(toTarget).add(name)) {
-            for (String dependency: knownTrees.get(name).dependencies) {
+            for (String dependency: knownTrees.get(name).dependencies.keySet()) {
                 addDependenciesOf(dependency, toTarget);
             }
         }
