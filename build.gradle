@@ -50,7 +50,7 @@ dependencies {
         exclude module: 'json'
         exclude module: 'gson'
     }
-    implementation 'com.danifoldi:microbase:0.5.0'
+    implementation 'com.danifoldi:microbase:0.6.0'
     compileOnly 'com.danifoldi:DataVerse:0.6.1'
     implementation 'com.danifoldi:DML:1.0.2'
 
