@@ -2,12 +2,12 @@ package com.danifoldi.forest.tree.logger;
 
 import com.danifoldi.dataverse.DataVerse;
 import com.danifoldi.dataverse.data.NamespacedMultiDataVerse;
-import com.danifoldi.dataverse.util.Pair;
 import com.danifoldi.forest.seed.Tree;
 import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
 import com.danifoldi.forest.seed.collector.collector.VersionCollector;
 import com.danifoldi.forest.tree.dataverse.DataverseNamespace;
 import com.danifoldi.microbase.Microbase;
+import com.danifoldi.microbase.util.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
