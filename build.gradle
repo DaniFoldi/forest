@@ -51,7 +51,7 @@ dependencies {
         exclude module: 'gson'
     }
     implementation 'com.danifoldi:microbase:0.6.0'
-    compileOnly 'com.danifoldi:DataVerse:0.6.1'
+    compileOnly 'com.danifoldi:DataVerse:0.7.1'
     implementation 'com.danifoldi:DML:1.0.2'
 
     implementation ('com.cronutils:cron-utils:9.2.0') {
