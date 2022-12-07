@@ -1,6 +1,7 @@
 package com.danifoldi.forest.tree.listener;
 
 import com.danifoldi.forest.seed.Tree;
+import com.danifoldi.forest.seed.collector.collector.PlatformCollector;
 import com.danifoldi.forest.seed.collector.collector.VersionCollector;
 import com.danifoldi.microbase.Microbase;
 import com.google.common.collect.Multimap;
@@ -12,6 +13,10 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 
 @VersionCollector("1.0.0")
+@PlatformCollector("spigot")
+@PlatformCollector("paper")
+@PlatformCollector("bungeecord")
+@PlatformCollector("waterfall")
 public class ListenerTree implements Tree {
 
     private Object listener;
