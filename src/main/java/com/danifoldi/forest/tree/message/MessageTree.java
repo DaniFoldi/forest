@@ -24,7 +24,7 @@ public class MessageTree implements Tree {
     public @NotNull CompletableFuture<?> load() {
         return CompletableFuture.runAsync(() -> {
             messages = DataVerse.getDataVerse().getNamespacedDataVerse(DataverseNamespace.get(), "message", Message::new);
-            messages.list().thenAccept(m -> MessageProvider.update(m.stream().collect(Collectors.toMap(Pair::getFirst, p -> p.getSecond().value))));
+            messages.list().thenAcceptAsync(m -> MessageProvider.update(m.stream().collect(Collectors.toMap(Pair::getFirst, p -> p.getSecond().value))), Microbase.getThreadPool("message"));
         }, Microbase.getThreadPool("message"));
     }
 
