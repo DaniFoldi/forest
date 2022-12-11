@@ -2,6 +2,7 @@ package com.danifoldi.forest.seed.collector.collector;
 
 import com.danifoldi.dml.DmlSerializer;
 import com.danifoldi.dml.type.DmlArray;
+import com.danifoldi.dml.type.DmlBoolean;
 import com.danifoldi.dml.type.DmlObject;
 import com.danifoldi.dml.type.DmlString;
 
@@ -40,13 +41,17 @@ public class CollectorProcessor extends AbstractProcessor {
                 DmlArray commands = new DmlArray(new ArrayList<>());
                 DmlArray messages = new DmlArray(new ArrayList<>());
                 DmlArray permissions = new DmlArray(new ArrayList<>());
+                DmlArray configs = new DmlArray(new ArrayList<>());
                 DmlArray platforms = new DmlArray(new ArrayList<>());
+                DmlArray dataverses = new DmlArray(new ArrayList<>());
                 DmlArray dependencies = new DmlArray(new ArrayList<>());
                 DmlObject out = new DmlObject(new HashMap<>());
                 out.set("commands", commands);
                 out.set("messages", messages);
                 out.set("permissions", permissions);
+                out.set("configs", configs);
                 out.set("platforms", platforms);
+                out.set("dataverses", dataverses);
                 out.set("dependencies", dependencies);
                 out.set("version", new DmlString("0.0.0"));
                 collected.put(treeName, out);
@@ -57,26 +62,48 @@ public class CollectorProcessor extends AbstractProcessor {
         try {
             for (TypeElement annotation : annotations) {
                 switch (annotation.getSimpleName().toString().replaceFirst("^Multi", "")) {
-                    case "CommandCollector":
+                    case "CommandCollector" -> {
                         for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
-                            for (CommandCollector c: element.getAnnotationsByType(CommandCollector.class)) {
+                            for (CommandCollector c : element.getAnnotationsByType(CommandCollector.class)) {
                                 collectForTree.apply(element).get("commands").asArray().add(new DmlString(c.value()));
                             }
                         }
-                        break;
-                    case "DependencyCollector":
+                    }
+                    case "ConfigCollector" -> {
                         for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
-                            for (DependencyCollector d: element.getAnnotationsByType(DependencyCollector.class)) {
+                            for (ConfigCollector c : element.getAnnotationsByType(ConfigCollector.class)) {
+                                DmlObject config = new DmlObject(new HashMap<>());
+                                config.set("class", new DmlString(roundEnv.getRootElements().stream().filter(e -> e.getKind().isClass()).findFirst().get().getSimpleName().toString()));
+                                config.set("set", new DmlString(c.set()));
+                                config.set("global", new DmlBoolean(c.global()));
+                                collectForTree.apply(element).get("dataverses").asArray().add(config);
+                            }
+                        }
+                    }
+                    case "DataverseCollector" -> {
+                        for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
+                            for (DataverseCollector d : element.getAnnotationsByType(DataverseCollector.class)) {
+                                DmlObject dataverse = new DmlObject(new HashMap<>());
+                                dataverse.set("class", new DmlString(roundEnv.getRootElements().stream().filter(e -> e.getKind().isClass()).findFirst().get().getSimpleName().toString()));
+                                dataverse.set("dataverse", new DmlString(d.dataverse()));
+                                dataverse.set("multi", new DmlBoolean(d.multi()));
+                                collectForTree.apply(element).get("dataverses").asArray().add(dataverse);
+                            }
+                        }
+                    }
+                    case "DependencyCollector" -> {
+                        for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
+                            for (DependencyCollector d : element.getAnnotationsByType(DependencyCollector.class)) {
                                 DmlObject dependency = new DmlObject(new HashMap<>());
                                 dependency.set("tree", new DmlString(d.tree()));
                                 dependency.set("minVersion", new DmlString(d.minVersion()));
                                 collectForTree.apply(element).get("dependencies").asArray().add(dependency);
                             }
                         }
-                        break;
-                    case "MessageCollector":
+                    }
+                    case "MessageCollector" -> {
                         for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
-                            for (MessageCollector m: element.getAnnotationsByType(MessageCollector.class)) {
+                            for (MessageCollector m : element.getAnnotationsByType(MessageCollector.class)) {
                                 DmlObject message = new DmlObject(new HashMap<>());
                                 message.set("template", new DmlString(m.value()));
                                 DmlArray replacements = new DmlArray(new ArrayList<>());
@@ -85,28 +112,28 @@ public class CollectorProcessor extends AbstractProcessor {
                                 collectForTree.apply(element).get("messages").asArray().add(message);
                             }
                         }
-                        break;
-                    case "PermissionCollector":
+                    }
+                    case "PermissionCollector" -> {
                         for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
-                            for (PermissionCollector p: element.getAnnotationsByType(PermissionCollector.class)) {
+                            for (PermissionCollector p : element.getAnnotationsByType(PermissionCollector.class)) {
                                 collectForTree.apply(element).get("permissions").asArray().add(new DmlString(p.value()));
                             }
                         }
-                        break;
-                    case "PlatformCollector":
+                    }
+                    case "PlatformCollector" -> {
                         for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
-                            for (PlatformCollector p: element.getAnnotationsByType(PlatformCollector.class)) {
+                            for (PlatformCollector p : element.getAnnotationsByType(PlatformCollector.class)) {
                                 collectForTree.apply(element).get("platforms").asArray().add(new DmlString(p.value()));
                             }
                         }
-                        break;
-                    case "VersionCollector":
+                    }
+                    case "VersionCollector" -> {
                         for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
-                            for (VersionCollector v: element.getAnnotationsByType(VersionCollector.class)) {
+                            for (VersionCollector v : element.getAnnotationsByType(VersionCollector.class)) {
                                 collectForTree.apply(element).get("version").asString().value(v.value());
                             }
                         }
-                        break;
+                    }
                 }
             }
             for (Map.Entry<String, DmlObject> tree: collected.entrySet()) {
