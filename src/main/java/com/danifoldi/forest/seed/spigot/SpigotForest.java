@@ -14,6 +14,7 @@ public class SpigotForest extends JavaPlugin {
     @Override
     public void onEnable() {
         Microbase.setup(Bukkit.getServer(), this, getDataFolder().toPath(), MessageProvider::provide);
+        TreeLoader.setInstance(loader);
         loader.fetchMetadata();
         loader.preloadKnownTrees();
         loader.loadTargets();

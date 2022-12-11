@@ -40,6 +40,16 @@ public class TreeLoader {
         return serverId;
     }
 
+    private static TreeLoader instance;
+
+    public static void setInstance(TreeLoader instance) {
+        TreeLoader.instance = instance;
+    }
+
+    public static TreeLoader getInstance() {
+        return instance;
+    }
+
 
     public void preloadKnownTrees() {
         for (Path jar: Microbase.getDatafolder().resolve("trees")) {
