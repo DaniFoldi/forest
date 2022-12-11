@@ -2,6 +2,7 @@ package com.danifoldi.forest.seed;
 
 import com.danifoldi.microbase.Microbase;
 
+import java.util.Map;
 import java.util.logging.Level;
 
 public class GrownTrees {
@@ -17,5 +18,9 @@ public class GrownTrees {
         }
         //noinspection unchecked
         return (T)info.tree;
+    }
+
+    public static Map<String, TreeInfo> getKnownTrees() {
+        return TreeLoader.knownTrees;
     }
 }
