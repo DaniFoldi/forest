@@ -4,6 +4,7 @@ import com.danifoldi.dataverse.DataVerse;
 import com.danifoldi.dataverse.data.NamespacedMultiDataVerse;
 import com.danifoldi.forest.seed.GrownTrees;
 import com.danifoldi.forest.seed.Tree;
+import com.danifoldi.forest.seed.TreeLoader;
 import com.danifoldi.forest.seed.collector.collector.CommandCollector;
 import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
 import com.danifoldi.forest.seed.collector.collector.MessageCollector;
@@ -45,7 +46,7 @@ public class MailTree implements Tree {
     @Override
     public @NotNull CompletableFuture<?> load() {
         return CompletableFuture.runAsync(() -> {
-            mailDataverse = DataVerse.getDataVerse().getNamespacedMultiDataVerse(DataverseNamespace.get(), "mail", Mail::new);
+            mailDataverse = DataVerse.getDataVerse().getNamespacedMultiDataVerse(DataverseNamespace.get(), "mail_%s".formatted(TreeLoader.getServerId()), Mail::new);
         }, Microbase.getThreadPool("mail"));
     }
 
