@@ -4,8 +4,11 @@ import com.danifoldi.dataverse.data.NamespacedMultiDataVerse;
 import com.danifoldi.forest.seed.TreeLoader;
 import com.danifoldi.microbase.Microbase;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
@@ -13,6 +16,8 @@ public class LoggerHandler extends Handler {
 
     NamespacedMultiDataVerse<LogEntry> logDataverse;
     List<LoggerFilter> filters;
+
+    List<Consumer<LogEntry>> handlers = Collections.synchronizedList(new ArrayList<>());
 
     public LoggerHandler(NamespacedMultiDataVerse<LogEntry> logDataverse, List<LoggerFilter> filters) {
         this.logDataverse = logDataverse;
@@ -33,7 +38,7 @@ public class LoggerHandler extends Handler {
                     return;
                 }
             }
-            logDataverse.add(TreeLoader.getServerId(), new LogEntry(
+            LogEntry entry = new LogEntry(
                     record.getLevel().intValue(),
                     record.getSequenceNumber(),
                     record.getSourceClassName(),
@@ -44,7 +49,10 @@ public class LoggerHandler extends Handler {
                     record.getResourceBundleName(),
                     record.getInstant(),
                     record.getThrown()
-            ));
+            );
+
+            handlers.forEach(handler -> handler.accept(entry));
+            logDataverse.add(TreeLoader.getServerId(), entry).join();
         }, Microbase.getThreadPool("logger"));
     }
 
