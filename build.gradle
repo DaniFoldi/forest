@@ -15,7 +15,6 @@ java {
 
 compileJava {
     options.compilerArgs << '-parameters'
-    options.release.set(17)
 }
 
 repositories {
@@ -50,13 +49,14 @@ dependencies {
         exclude module: 'json'
         exclude module: 'gson'
     }
-    implementation 'com.danifoldi:microbase:0.6.0'
+    implementation 'com.danifoldi:microbase:0.7.0'
     compileOnly 'com.danifoldi:DataVerse:0.7.1'
     implementation 'com.danifoldi:DML:1.0.2'
 
     implementation ('com.cronutils:cron-utils:9.2.0') {
         exclude module: 'slf4j-api'
     }
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     implementation 'com.github.stefvanschie.inventoryframework:IF:0.10.7'
     compileOnly 'net.luckperms:api:5.4'
     compileOnly ('com.github.LeonMangler:PremiumVanishAPI:2.7.11-2') {
@@ -143,6 +143,9 @@ shadowJar {
     relocate 'com.cronutils', 'com.danifoldi.forest.lib.cronutils'
     relocate 'com.eclipsesource.json', 'com.danifoldi.forest.lib.json'
     relocate 'com.danifoldi.dml', 'com.danifoldi.forest.lib.dml'
+    relocate 'okio', 'com.danifoldi.forest.lib.okio'
+    relocate 'okhttp3', 'com.danifoldi.forest.lib.okhttp3'
+    relocate 'kotlin', 'com.danifoldi.forest.lib.kotlin'
 
     archiveFileName = "forest-${project.version}.jar"
 }
