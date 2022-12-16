@@ -62,6 +62,6 @@ public class ManagerTree implements Tree {
                 .build(),
                 new ManagerListener());
         websockets.add(webSocket);
-        sender.send(Microbase.baseMessage().providedText("connect.connected").replace("{url}", "https://forest.danifoldi.com/api/%s".formatted(uuid)));
+        sender.send(Microbase.baseMessage().providedText("connect.connected").replace("{url}", "https://forest.danifoldi.com/connector/%s".formatted(uuid)));
     }
 }

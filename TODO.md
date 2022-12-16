@@ -1,0 +1,79 @@
+# TODO targets
+
+- [x] BungeeMail
+- [ ] BungeeResourcepacks
+- [ ] ChatBridge
+- [ ] ChatSentry
+- [ ] ClientDetector
+- [ ] LiteBans
+- [ ] Maintenance
+- [ ] MinigameNet
+- [x] Parancskuld
+- [ ] ProtoGUI
+- [ ] ProxyUtilities
+  - [ ] Adminchat
+  - [ ] Chatlogger
+  - [ ] Discordstatus
+  - [ ] Iplogger
+  - [ ] Javaerror
+  - [ ] Joinquit
+  - [ ] Namefilter
+  - [ ] Rules
+  - [ ] Servercommands
+- [x] RemoteCommands
+- [ ] ServerListPlus
+- [ ] SPR
+- [ ] TAB
+- [ ] AFKSzerverPlugin
+- [ ] WorldGuardEndermanTeleport
+- [ ] ActionCosmetic
+- [ ] StarColor
+- [ ] AntiPopup
+- [ ] AutoTune
+- [ ] PaperMisc
+  - [ ] Abstractcmd
+  - [ ] Actionbarfilter
+  - [ ] Armorhand
+  - [ ] Autosell
+  - [ ] Chatcmd
+  - [ ] Defercmd
+  - [ ] Delayjoin
+  - [ ] Doublejump
+  - [ ] Duelslimit
+  - [ ] Enchantsuccess
+  - [ ] Forcesrp
+  - [ ] Gracefulrestart
+  - [ ] Head
+  - [ ] Joinmessage
+  - [ ] Nomend
+  - [ ] Nospawn
+  - [ ] Oldcombat
+  - [ ] Pluginhider
+  - [ ] Portal
+  - [ ] Projectileknockback
+  - [ ] Ptell
+  - [ ] Shulkerinshulker
+  - [ ] Surveynudge
+  - [ ] Tebexcoupon
+  - [ ] Uniquemap
+  - [ ] Zonekick
+- [ ] MineResetLite
+- [ ] CrashMe
+- [ ] CrateReloaded
+- [ ] PhatLoots
+- [x] CronCommand
+- [ ] DailyRewards
+- [ ] DeathChestPro
+- [ ] Duels
+- [ ] Combat npc
+- [ ] Eztneveddfel
+- [ ] Harbor
+- [ ] JetsAntiAFKPro
+- [ ] Pwarp
+- [ ] UltraBar
+- [ ] ChatGames
+- [ ] Announce
+- [ ] EconomyPlugin
+- [ ] SuperbVote
+- [ ] nuVotifier
+- [ ] NameGuard
