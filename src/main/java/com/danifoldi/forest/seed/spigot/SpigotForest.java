@@ -15,13 +15,14 @@ public class SpigotForest extends JavaPlugin {
     public void onEnable() {
         Microbase.setup(Bukkit.getServer(), this, getDataFolder().toPath(), MessageProvider::provide);
         TreeLoader.setInstance(loader);
-        loader.fetchMetadata();
-        loader.preloadKnownTrees();
-        loader.loadTargets();
+        loader.fetchMetadata().thenRunAsync(() -> {
+            loader.preloadKnownTrees();
+            loader.loadTargets().join();
+        }, Microbase.getThreadPool("forest")).join();
     }
 
     @Override
     public void onDisable() {
-        loader.unloadTargets(true);
+        loader.unloadTargets(true).join();
     }
 }

@@ -22,6 +22,6 @@ public class BungeeForest extends Plugin {
 
     @Override
     public void onDisable() {
-        loader.unloadTargets(true);
+        loader.unloadTargets(true).join();
     }
 }

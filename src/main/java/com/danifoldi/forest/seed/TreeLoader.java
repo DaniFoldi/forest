@@ -245,7 +245,7 @@ public class TreeLoader {
                 }
             }
             return true;
-        });
+        }, Microbase.getThreadPool("forest"));
     }
 
     public CompletableFuture<Boolean> unloadTargets(boolean force) {
@@ -256,7 +256,7 @@ public class TreeLoader {
                 }
             }
             return true;
-        });
+        }, Microbase.getThreadPool("forest"));
     }
 
     private void addDependenciesOf(String name, String toTarget) {
@@ -277,7 +277,7 @@ public class TreeLoader {
             flattenedTargetDependencies.putIfAbsent(name, Collections.synchronizedSet(new TreeSet<>()));
             addDependenciesOf(name, name);
             return loadTree(name).join();
-        });
+        }, Microbase.getThreadPool("forest"));
     }
 
     public CompletableFuture<Boolean> unloadTarget(String name, boolean force) {
@@ -305,6 +305,6 @@ public class TreeLoader {
                 }
             }
             return true;
-        });
+        }, Microbase.getThreadPool("forest"));
     }
 }

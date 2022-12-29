@@ -44,13 +44,14 @@ public class VelocityForest {
     public void onInitialize(ProxyInitializeEvent event) {
         Microbase.setup(proxyServer, this, datafolder, MessageProvider::provide);
         TreeLoader.setInstance(loader);
-        loader.fetchMetadata();
-        loader.preloadKnownTrees();
-        loader.loadTargets();
+        loader.fetchMetadata().thenRunAsync(() -> {
+            loader.preloadKnownTrees();
+            loader.loadTargets().join();
+        }, Microbase.getThreadPool("forest")).join();
     }
 
     @Subscribe
     public void onShutdown(ProxyShutdownEvent event) {
-        loader.unloadTargets(true);
+        loader.unloadTargets(true).join();
     }
 }
