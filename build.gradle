@@ -39,7 +39,7 @@ dependencies {
     compileOnly 'com.velocitypowered:velocity-api:3.1.1'
     annotationProcessor 'com.velocitypowered:velocity-api:3.1.1'
 
-    compileOnly 'net.kyori:adventure-platform-bungeecord:4.1.2'
+    compileOnly 'net.kyori:adventure-platform-bungeecord:4.2.0'
 
     implementation ('grapefruit:grapefruit:1.5.0') {
         exclude module: 'guava'
@@ -49,7 +49,7 @@ dependencies {
         exclude module: 'json'
         exclude module: 'gson'
     }
-    implementation 'com.danifoldi:microbase:0.7.0'
+    implementation 'com.danifoldi:microbase:0.7.1'
     compileOnly 'com.danifoldi:DataVerse:0.7.1'
     implementation 'com.danifoldi:DML:1.0.2'
 
@@ -57,12 +57,12 @@ dependencies {
         exclude module: 'slf4j-api'
     }
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-    implementation 'com.github.stefvanschie.inventoryframework:IF:0.10.7'
+    implementation 'com.github.stefvanschie.inventoryframework:IF:0.10.8'
     compileOnly 'net.luckperms:api:5.4'
     compileOnly ('com.github.LeonMangler:PremiumVanishAPI:2.7.11-2') {
         exclude module: 'jsr305'
     }
-    compileOnly 'dev.simplix:protocolize-api:2.2.2'
+    compileOnly 'dev.simplix:protocolize-api:2.2.4'
     compileOnly ('me.lokka30:treasury-api:1.2.1') {
         exclude module: 'annotations'
     }
@@ -73,7 +73,7 @@ dependencies {
     compileOnly project(':collector')
     annotationProcessor project(':collector')
 
-    compileOnly 'org.jetbrains:annotations:23.0.0'
+    compileOnly 'org.jetbrains:annotations:23.1.0'
 }
 
 task 'build-tree' {
