@@ -9,6 +9,7 @@ import com.danifoldi.microbase.Microbase;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -41,24 +42,38 @@ public class TreeInfo {
          this.pack = pack;
     }
 
-    public boolean makeTree() {
+    public boolean loadTreeInfo() {
         try {
+            Microbase.logger.log(Level.INFO, "Loading tree info from %s".formatted(className));
             treeClass = Class.forName(className, true, classLoader).asSubclass(Tree.class);
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(treeClass.getResourceAsStream("trees/%s.dml".formatted(pack)))))) {
+            InputStream stream = treeClass.getResourceAsStream("/trees/%s.dml".formatted(pack));
+            if (stream == null) {
+                Microbase.logger.log(Level.WARNING, "Tree %s doesn't contain a tree description file".formatted(pack));
+                return false;
+            }
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
                 String dmlString = reader.lines().collect(Collectors.joining("\n"));
                 DmlObject dml = DmlParser.parse(dmlString).asObject();
-                version = dml.get("version").toString();
+                version = dml.get("version").asString().value();
                 commands = dml.get("commands").asArray().value().stream().map(DmlValue::asString).map(DmlString::value).collect(Collectors.toSet());
                 platforms = dml.get("platforms").asArray().value().stream().map(DmlValue::asString).map(DmlString::value).collect(Collectors.toSet());
                 messages = dml.get("messages").asArray().value().stream().map(DmlValue::asObject).collect(Collectors.toMap(v -> v.get("template").asString().value(), v -> v.get("replacements").asArray().value().stream().map(r -> r.asString().value()).toList()));
                 dependencies = dml.get("dependencies").asArray().value().stream().map(DmlValue::asObject).collect(Collectors.toMap(v -> v.get("tree").asString().value(), v -> v.get("minVersion").asString().value()));
+                return true;
             } catch (DmlParseException | IOException e) {
                 Microbase.logger.log(Level.SEVERE, "Could not load tree metadata %s: %s".formatted(pack, e.getMessage()));
                 return false;
             }
+        } catch (ClassNotFoundException e) {
+            Microbase.logger.log(Level.WARNING, "Could not load tree class %s".formatted(className));
+            return false;
+        }
+    }
+
+    public boolean makeTree() {
+        try {
             tree = treeClass.getConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException |
-                 ClassNotFoundException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             Microbase.logger.log(Level.WARNING, "Could not load tree class %s".formatted(className));
             return false;
         }

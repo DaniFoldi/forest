@@ -4,7 +4,7 @@ import com.danifoldi.forest.seed.GrownTrees;
 import com.danifoldi.forest.seed.Tree;
 import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
 import com.danifoldi.forest.seed.collector.collector.VersionCollector;
-import com.danifoldi.forest.tree.ratelimit.RateLimitTree;
+import com.danifoldi.forest.tree.ratelimit.RatelimitTree;
 import com.danifoldi.microbase.Microbase;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +29,7 @@ public class SwrcacheTree implements Tree {
 
     public <T> T getCached(String namespace, String key, Supplier<T> refresher, long staleAfterMs) {
         String cacheKey = "%s_%s".formatted(namespace, key);
-        if (GrownTrees.get(RateLimitTree.class).rateLimit(cacheKey, staleAfterMs, ChronoUnit.MILLIS)) {
+        if (GrownTrees.get(RatelimitTree.class).rateLimit(cacheKey, staleAfterMs, ChronoUnit.MILLIS)) {
             CompletableFuture.runAsync(() -> {
                 cache.put(cacheKey, refresher.get());
             }, Microbase.getThreadPool("swrcache"));

@@ -10,14 +10,14 @@ import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
 import com.danifoldi.forest.seed.collector.collector.MessageCollector;
 import com.danifoldi.forest.seed.collector.collector.PermissionCollector;
 import com.danifoldi.forest.seed.collector.collector.VersionCollector;
-import com.danifoldi.forest.tree.dataverse.DataverseNamespace;
+import com.danifoldi.forest.tree.actioninfo.ActioninfoTree;
+import com.danifoldi.forest.tree.dataverse.DataverseTree;
 import com.danifoldi.forest.tree.paginate.PaginateTree;
 import com.danifoldi.forest.tree.playersession.PlayersessionTree;
 import com.danifoldi.microbase.BaseMessage;
 import com.danifoldi.microbase.BasePlayer;
 import com.danifoldi.microbase.BaseSender;
 import com.danifoldi.microbase.Microbase;
-import com.danifoldi.microbase.util.Pair;
 import grapefruit.command.CommandDefinition;
 import grapefruit.command.parameter.modifier.Flag;
 import grapefruit.command.parameter.modifier.OptParam;
@@ -38,15 +38,16 @@ import java.util.function.Predicate;
 @DependencyCollector(tree="listener", minVersion="1.0.0")
 @DependencyCollector(tree="paginate", minVersion="1.0.0")
 @DependencyCollector(tree="playersession", minVersion="1.0.0")
+@DependencyCollector(tree="actioninfo", minVersion="1.0.0")
 @CommandCollector("mail")
 public class MailTree implements Tree {
 
-    NamespacedMultiDataVerse<Mail> mailDataverse;
+    private NamespacedMultiDataVerse<Mail> mailDataverse;
 
     @Override
     public @NotNull CompletableFuture<?> load() {
         return CompletableFuture.runAsync(() -> {
-            mailDataverse = DataVerse.getDataVerse().getNamespacedMultiDataVerse(DataverseNamespace.get(), "mail_%s".formatted(TreeLoader.getServerId()), Mail::new);
+            mailDataverse = DataVerse.getDataVerse().getNamespacedMultiDataVerse(GrownTrees.get(DataverseTree.class), "mail_%s".formatted(TreeLoader.getServerId()), Mail::new);
         }, Microbase.getThreadPool("mail"));
     }
 
@@ -59,6 +60,8 @@ public class MailTree implements Tree {
     @MessageCollector(value="forest.mail.received", replacements={"{sender}"})
     @MessageCollector(value="forest.mail.sent")
     @MessageCollector(value="forest.unknownPlayer", replacements={"{player}"})
+    @MessageCollector(value="forest.mail.action.short", replacements={"{count}"})
+    @MessageCollector(value="forest.mail.action.long", replacements={"{count}"})
     @PermissionCollector("forest.mail.command.mail.send")
     public void onMailSend(@Source BaseSender sender, String recipient, @Greedy String message) {
         Optional<UUID> recipientId = GrownTrees.get(PlayersessionTree.class).uuidOf(recipient).join();
@@ -69,7 +72,14 @@ public class MailTree implements Tree {
         mailDataverse.add(recipientId.get(), new Mail(sender.name(), message));
         BasePlayer player = Microbase.getPlatform().getPlayer(recipientId.get());
         if (player != null) {
+            long unreadCount = mailDataverse.get(sender.uniqueId()).join().stream().filter(Predicate.not(Mail::isRead)).count();
             player.send(Microbase.baseMessage().providedText("forest.mail.received").replace("{sender}", sender.name()));
+            GrownTrees.get(ActioninfoTree.class).addAction(
+                    player,
+                    "mail",
+                    Microbase.baseMessage().providedText("forest.mail.action.short").replace("{count}", String.valueOf(unreadCount)),
+                    Microbase.baseMessage().providedText("forest.mail.action.long").replace("{count}", String.valueOf(unreadCount))
+            );
         }
         sender.send(Microbase.baseMessage().providedText("forest.mail.sent"));
     }
@@ -88,7 +98,6 @@ public class MailTree implements Tree {
         if (page == null) {
             page = 1;
         }
-
 
         if (all) {
             List<Mail> mails = mailDataverse.get(sender.uniqueId(), page, 10).join();
@@ -154,11 +163,12 @@ public class MailTree implements Tree {
     @CommandDefinition(route="mail clear", permission="forest.mail.command.mail.clear", runAsync=true)
     @MessageCollector(value="forest.mail.deleted", replacements={"{count}"})
     @PermissionCollector("forest.mail.command.mail.clear")
-    public void onMailDelete(@Source BaseSender sender, @Flag(value="--all", shorthand='a') boolean all) {
+    public void onMailDelete(@Source BasePlayer sender, @Flag(value="--all", shorthand='a') boolean all) {
         List<Mail> toDelete = all ? mailDataverse.get(sender.uniqueId()).join() : mailDataverse.filterBool(sender.uniqueId(), mailDataverse.getField("read"), true).join();
         for (Mail mail: toDelete) {
             mailDataverse.delete(sender.uniqueId(), mail).join();
         }
         sender.send(Microbase.baseMessage().providedText("forest.mail.deleted").replace("{count}", String.valueOf(toDelete.size())));
+        GrownTrees.get(ActioninfoTree.class).removeAction(sender, "mail");
     }
 }

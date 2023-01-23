@@ -7,7 +7,7 @@ import com.danifoldi.forest.seed.Tree;
 import com.danifoldi.forest.seed.TreeLoader;
 import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
 import com.danifoldi.forest.seed.collector.collector.VersionCollector;
-import com.danifoldi.forest.tree.dataverse.DataverseNamespace;
+import com.danifoldi.forest.tree.dataverse.DataverseTree;
 import com.danifoldi.forest.tree.listener.ForestJoinEvent;
 import com.danifoldi.forest.tree.listener.ForestLeaveEvent;
 import com.danifoldi.forest.tree.listener.ListenerTree;
@@ -35,7 +35,7 @@ public class PlayersessionTree implements Tree {
     @Override
     public @NotNull CompletableFuture<?> load() {
         return CompletableFuture.runAsync(() -> {
-            sessionDataverse = DataVerse.getDataVerse().getNamespacedDataVerse(DataverseNamespace.get(), "playersession_%s".formatted(TreeLoader.getServerId()), PlayerSession::new);
+            sessionDataverse = DataVerse.getDataVerse().getNamespacedDataVerse(GrownTrees.get(DataverseTree.class), "playersession_%s".formatted(TreeLoader.getServerId()), PlayerSession::new);
             GrownTrees.get(ListenerTree.class).addListener(PlayersessionTree.class, ForestJoinEvent.class, event -> {
                 CompletableFuture.runAsync(() -> {
                     if (sessionIds.containsKey(event.playerName())) {

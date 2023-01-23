@@ -48,7 +48,7 @@ public class ListTree implements Tree, CommandContainer {
         sender.send(Microbase.baseMessage().providedText("list.playercount").replace("{count}", String.valueOf(count)));
         Microbase.getPlatform().getServers().forEach((id, server) -> {
             List<BasePlayer> visiblePlayers = server.players().stream().filter(sender::canSee).toList();
-            BaseMessage message = Microbase.baseMessage().providedText("list.server").replace("{count}", String.valueOf(visiblePlayers.size()));
+            BaseMessage message = Microbase.baseMessage().providedText("list.server.%s".formatted(id)).replace("{count}", String.valueOf(visiblePlayers.size()));
             for (BasePlayer player: visiblePlayers) {
                 message = message.text().rawText(player.name());
             }

@@ -9,13 +9,15 @@ import com.danifoldi.forest.seed.collector.collector.CommandCollector;
 import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
 import com.danifoldi.forest.seed.collector.collector.PermissionCollector;
 import com.danifoldi.forest.seed.collector.collector.VersionCollector;
+import com.danifoldi.forest.tree.command.CommandTree;
 import com.danifoldi.forest.tree.config.ConfigTree;
-import com.danifoldi.forest.tree.dataverse.DataverseNamespace;
+import com.danifoldi.forest.tree.dataverse.DataverseTree;
 import com.danifoldi.microbase.BasePlayer;
 import com.danifoldi.microbase.BaseScheduler;
 import com.danifoldi.microbase.BaseSender;
 import com.danifoldi.microbase.Microbase;
 import com.danifoldi.microbase.util.Pair;
+import grapefruit.command.CommandContainer;
 import grapefruit.command.CommandDefinition;
 import grapefruit.command.parameter.modifier.Flag;
 import grapefruit.command.parameter.modifier.Source;
@@ -33,7 +35,7 @@ import java.util.logging.Level;
 @DependencyCollector(tree="command", minVersion="1.0.0")
 @DependencyCollector(tree="config", minVersion="1.0.0")
 @DependencyCollector(tree="dataverse", minVersion="1.0.0")
-public class BroadcastTree implements Tree {
+public class BroadcastTree implements Tree, CommandContainer {
 
     private BaseScheduler.BaseTask broadcastTask;
     private NamespacedMultiDataVerse<BroadcastAnnouncement> announcementDataverse;
@@ -41,7 +43,8 @@ public class BroadcastTree implements Tree {
     @Override
     public @NotNull CompletableFuture<?> load() {
         return CompletableFuture.runAsync(() -> {
-            announcementDataverse = DataVerse.getDataVerse().getNamespacedMultiDataVerse(DataverseNamespace.get(), "broadcast_%s".formatted(TreeLoader.getServerId()), BroadcastAnnouncement::new);
+            GrownTrees.get(CommandTree.class).registerCommands(this);
+            announcementDataverse = DataVerse.getDataVerse().getNamespacedMultiDataVerse(GrownTrees.get(DataverseTree.class), "broadcast_%s".formatted(TreeLoader.getServerId()), BroadcastAnnouncement::new);
             GrownTrees.get(ConfigTree.class).getConfigFor("broadcast", true, BroadcastConfig::new).thenAcceptAsync(config -> {
                 broadcastTask = Microbase.getScheduler().runTaskEvery(() -> {
                     announcementDataverse.list(1, 1, announcementDataverse.getField("priority"), true).thenAcceptAsync(announcements -> {
@@ -63,6 +66,7 @@ public class BroadcastTree implements Tree {
     @Override
     public @NotNull CompletableFuture<@NotNull Boolean> unload(boolean force) {
         return CompletableFuture.supplyAsync(() -> {
+            GrownTrees.get(CommandTree.class).unregisterCommands(this);
             broadcastTask.cancel();
             return Microbase.shutdownThreadPool("broadcast", 1000, force);
         });
@@ -70,11 +74,15 @@ public class BroadcastTree implements Tree {
 
     public void broadcastImmediately(BroadcastAnnouncement announcement) {
         List<String> servers = Arrays.asList(announcement.serverCondition.split(","));
+        List<String> permissions = Arrays.asList(announcement.permissionCondition.split(","));
         List<String> players = Arrays.asList(announcement.playerCondition.split(","));
         List<String> worlds = Arrays.asList(announcement.worldCondition.split(","));
         for (BasePlayer player: Microbase.getPlatform().getPlayers()) {
             if (!servers.isEmpty() && !servers.contains(player.connectedTo().name())) {
                 continue;
+            }
+            if (!permissions.isEmpty() && !permissions.stream().allMatch(player::hasPermission)) {
+                return;
             }
             if (!players.isEmpty() && !players.contains(player.name())) {
                 continue;

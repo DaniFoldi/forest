@@ -9,5 +9,6 @@ public class BroadcastAnnouncement {
     String mode = "chat";
     String worldCondition = "";
     String playerCondition = "";
+    String permissionCondition = "";
     String serverCondition = "";
 }

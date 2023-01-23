@@ -12,7 +12,7 @@ import com.danifoldi.forest.seed.TreeLoader;
 import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
 import com.danifoldi.forest.seed.collector.collector.VersionCollector;
 import com.danifoldi.forest.tree.config.ConfigTree;
-import com.danifoldi.forest.tree.dataverse.DataverseNamespace;
+import com.danifoldi.forest.tree.dataverse.DataverseTree;
 import com.danifoldi.forest.tree.task.TaskTree;
 import com.danifoldi.microbase.BaseScheduler;
 import com.danifoldi.microbase.Microbase;
@@ -52,7 +52,7 @@ public class CronTree implements Tree {
     @Override
     public @NotNull CompletableFuture<?> load() {
         return CompletableFuture.runAsync(() -> {
-            NamespacedMultiDataVerse<CronTask> cronDataverse = DataVerse.getDataVerse().getNamespacedMultiDataVerse(DataverseNamespace.get(), "cron_%s".formatted(TreeLoader.getServerId()), CronTask::new);
+            NamespacedMultiDataVerse<CronTask> cronDataverse = DataVerse.getDataVerse().getNamespacedMultiDataVerse(GrownTrees.get(DataverseTree.class), "cron_%s".formatted(TreeLoader.getServerId()), CronTask::new);
             CronConfig config = GrownTrees.get(ConfigTree.class).getConfigFor("cron", true, CronConfig::new).join();
             if (config.catchupOnStartup) {
                 Microbase.getScheduler().runTaskAfter(() -> {

@@ -1,4 +1,4 @@
-package com.danifoldi.forest.tree.ping;
+package com.danifoldi.forest.tree.helpop;
 
 import com.danifoldi.forest.seed.GrownTrees;
 import com.danifoldi.forest.seed.Tree;
@@ -14,7 +14,6 @@ import com.danifoldi.microbase.BaseSender;
 import com.danifoldi.microbase.Microbase;
 import grapefruit.command.CommandContainer;
 import grapefruit.command.CommandDefinition;
-import grapefruit.command.parameter.modifier.OptParam;
 import grapefruit.command.parameter.modifier.Source;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,27 +21,28 @@ import java.util.concurrent.CompletableFuture;
 
 @VersionCollector("1.0.0")
 @DependencyCollector(tree="command", minVersion="1.0.0")
-@DependencyCollector(tree="message", minVersion="1.0.0")
-public class PingTree implements Tree, CommandContainer {
+public class HelpopTree implements Tree, CommandContainer {
     @Override
     public @NotNull CompletableFuture<?> load() {
-        return CompletableFuture.runAsync(() -> GrownTrees.get(CommandTree.class).registerCommands(this), Microbase.getThreadPool("ping"));
+        return CompletableFuture.runAsync(() -> {
+            GrownTrees.get(CommandTree.class).registerCommands(this);
+        }, Microbase.getThreadPool("helpop"));
     }
 
     @Override
     public @NotNull CompletableFuture<@NotNull Boolean> unload(boolean force) {
         return CompletableFuture.supplyAsync(() -> {
-            GrownTrees.get(CommandTree.class).unregisterCommands(this);
-            return Microbase.shutdownThreadPool("ping", 1000, force);
+            GrownTrees.get(CommandTree.class).registerCommands(this);
+            return Microbase.shutdownThreadPool("helpop", 1000, force);
         });
     }
 
-    @CommandCollector("ping")
-    @PermissionCollector("forest.ping.command.ping")
-    @MessageCollector(value = "command.ping.pong", replacements = {"{ping}"})
-    @MessageCollector("command.ping.consolepong")
-    @CommandDefinition(route = "ping", permission = "forest.ping.command.ping", runAsync = true)
-    public void pingCommand(@Source BaseSender sender) {
+    @CommandCollector("helpop")
+    @PermissionCollector("forest.helpop.command.helpop")
+    @MessageCollector(value="command.helpop.sent")
+    @MessageCollector(value="command.helpop.none")
+    @CommandDefinition(route="helpop", permission="forest.helpop.command.helpop", runAsync=true)
+    public void helpopCommand(@Source BaseSender sender) {
         BaseMessage message;
         if (sender instanceof BasePlayer player) {
             message = Microbase.baseMessage().providedText("command.ping.pong").replace("{ping}", String.valueOf(player.ping()));

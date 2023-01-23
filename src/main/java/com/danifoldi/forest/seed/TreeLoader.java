@@ -9,13 +9,17 @@ import com.danifoldi.microbase.MicrobasePlatformType;
 import com.danifoldi.microbase.util.FileUtil;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -52,20 +56,47 @@ public class TreeLoader {
 
 
     public void preloadKnownTrees() {
-        for (Path jar: Microbase.getDatafolder().resolve("trees")) {
-            try {
-                ClassLoader loader = URLClassLoader.newInstance(new URL[]{jar.toUri().toURL()}, getClass().getClassLoader());
+        try {
+            FileUtil.ensureFolder(Microbase.getDatafolder());
+            FileUtil.ensureFolder(Microbase.getDatafolder().resolve("trees"));
+        } catch (IOException e) {
+            Microbase.logger.log(Level.SEVERE, "Could not create folder for trees, something is probably wrong");
+            return;
+        }
+
+        List<URL> urls = new ArrayList<>();
+
+        try (Stream<Path> files = Files.list(Microbase.getDatafolder().resolve("trees"))) {
+            files.forEach(path -> {
+                try {
+                    urls.add(path.toUri().toURL());
+                } catch (MalformedURLException e) {
+                    Microbase.logger.log(Level.SEVERE, "Could not load tree jar url %s".formatted(path));
+                }
+            });
+        } catch (IOException e) {
+            Microbase.logger.log(Level.SEVERE, "Could not load tree jar list");
+            return;
+        }
+
+        URLClassLoader loader = URLClassLoader.newInstance(urls.toArray(URL[]::new), getClass().getClassLoader());
+
+        try (Stream<Path> files = Files.list(Microbase.getDatafolder().resolve("trees"))) {
+            for (Iterator<Path> it = files.iterator(); it.hasNext(); ) {
+                Path jar = it.next();
                 String file = jar.getFileName().toString();
-                String pack = file.toLowerCase(Locale.ROOT);
-                String clazz = file.substring(0, 1).toUpperCase(Locale.ROOT) + file.substring(1).toLowerCase(Locale.ROOT);
+                String pack = file.toLowerCase(Locale.ROOT).replaceFirst("^[Ff]orest-?", "").replaceFirst("-\\d.*", "").replaceFirst("\\.jar$", "");
                 if (knownTrees.getOrDefault(pack, TreeInfo.EMPTY).loaded) {
                     Microbase.logger.log(Level.INFO, "Tree %s is currently loaded. Unload to update cache".formatted(pack));
                 } else {
-                    knownTrees.put(pack, new TreeInfo(loader, "com.danifoldi.forest.tree.%s.%sTree".formatted(pack, clazz), pack));
+                    TreeInfo treeInfo = new TreeInfo(loader, "com.danifoldi.forest.tree.%s.%sTree".formatted(pack, pack.substring(0, 1).toUpperCase(Locale.ROOT) + pack.substring(1).toLowerCase(Locale.ROOT)), pack);
+                    treeInfo.loadTreeInfo();
+                    knownTrees.put(pack, treeInfo);
+                    Microbase.logger.log(Level.INFO, "Found tree %s in %s".formatted(pack, file));
                 }
-            } catch (MalformedURLException e) {
-                Microbase.logger.log(Level.SEVERE, "Could not load %s url".formatted(jar.getFileName().toString()));
             }
+        } catch (IOException e) {
+            Microbase.logger.log(Level.SEVERE, "Could not load available trees");
         }
     }
 
@@ -100,11 +131,14 @@ public class TreeLoader {
             return true;
         }
 
+        if (requirement.matches("\\d+\\.\\d+\\.\\d+")) {
+            requirement = ">=" + requirement;
+        }
+
         if (requirement.startsWith(">=")) {
             String minVersion = requirement.substring(2);
             String[] versionComponents = version.split("\\.");
             String[] minComponents = minVersion.split("\\.");
-            // TODO allocate arrays in a single go
             while (versionComponents.length < minComponents.length) {
                 versionComponents = Stream.concat(Arrays.stream(versionComponents), Stream.of("0")).toArray(String[]::new);
             }
@@ -135,14 +169,19 @@ public class TreeLoader {
 
     public CompletableFuture<Boolean> loadTree(String name, String versionRequirement) {
         return CompletableFuture.supplyAsync(() -> {
+            Microbase.logger.log(Level.INFO, "Growing tree %s".formatted(name));
             if (!knownTrees.containsKey(name)) {
-                Microbase.logger.log(Level.WARNING, "Cannot find tree %s to load", name);
+                Microbase.logger.log(Level.WARNING, "Cannot find tree %s to load".formatted(name));
                 return false;
             }
 
             TreeInfo tree = knownTrees.get(name);
+            if (tree.loaded) {
+                return true;
+            }
+
             if (!versionMatches(tree.version, versionRequirement)) {
-                Microbase.logger.log(Level.SEVERE, "Tree %s has version %s which is not compatible with %s".formatted(name, tree.version, versionRequirement));
+                Microbase.logger.log(Level.SEVERE, "Tree %s has version %s which is not compatible with %s required".formatted(name, tree.version, versionRequirement));
                 return false;
             }
 
@@ -157,15 +196,14 @@ public class TreeLoader {
                 }
             }
 
-            if (tree.loaded) {
-                return true;
-            }
+            Microbase.logger.log(Level.INFO, "Loading tree %s".formatted(name));
 
             if (!tree.makeTree()) {
                 return false;
             }
 
             tree.tree.load().join();
+            tree.loaded = true;
 
             return true;
         }, Microbase.getThreadPool("forest"));
@@ -173,8 +211,9 @@ public class TreeLoader {
 
     public CompletableFuture<Boolean> unloadTree(String name, boolean force) {
         return CompletableFuture.supplyAsync(() -> {
+            Microbase.logger.log(Level.INFO, "Unloading tree %s".formatted(name));
             if (!knownTrees.containsKey(name)) {
-                Microbase.logger.log(Level.WARNING, "Cannot find tree %s to unload", name);
+                Microbase.logger.log(Level.WARNING, "Cannot find tree %s to unload".formatted(name));
                 return false;
             }
 
@@ -186,6 +225,7 @@ public class TreeLoader {
             if (!tree.tree.unload(force).join()) {
                 return false;
             }
+            tree.loaded = false;
 
             for (String dependency: knownTrees.get(name).dependencies.keySet()) {
                 if (!unloadTree(dependency, force).join()) {
@@ -199,7 +239,7 @@ public class TreeLoader {
 
     public CompletableFuture<Boolean> loadTargets() {
         return CompletableFuture.supplyAsync(() -> {
-            for (String target : targets) {
+            for (String target: targets) {
                 if (!loadTarget(target).join()) {
                     return false;
                 }
@@ -210,7 +250,7 @@ public class TreeLoader {
 
     public CompletableFuture<Boolean> unloadTargets(boolean force) {
         return CompletableFuture.supplyAsync(() -> {
-            for (String target : targets) {
+            for (String target: targets) {
                 if (!unloadTarget(target, force).join()) {
                     return false;
                 }
@@ -229,6 +269,11 @@ public class TreeLoader {
 
     public CompletableFuture<Boolean> loadTarget(String name) {
         return CompletableFuture.supplyAsync(() -> {
+            Microbase.logger.log(Level.INFO, "Loading target %s".formatted(name));
+            if (!knownTrees.containsKey(name)) {
+                Microbase.logger.log(Level.SEVERE, "Could not find target %s to load".formatted(name));
+                return false;
+            }
             flattenedTargetDependencies.putIfAbsent(name, Collections.synchronizedSet(new TreeSet<>()));
             addDependenciesOf(name, name);
             return loadTree(name).join();
@@ -237,6 +282,7 @@ public class TreeLoader {
 
     public CompletableFuture<Boolean> unloadTarget(String name, boolean force) {
         return CompletableFuture.supplyAsync(() -> {
+            Microbase.logger.log(Level.INFO, "Unloading target %s".formatted(name));
             if (!unloadTree(name, force).join()) {
                 return false;
             }

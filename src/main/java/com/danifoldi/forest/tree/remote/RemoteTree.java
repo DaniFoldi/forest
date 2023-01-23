@@ -7,6 +7,7 @@ import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
 import com.danifoldi.forest.seed.collector.collector.MessageCollector;
 import com.danifoldi.forest.seed.collector.collector.PermissionCollector;
 import com.danifoldi.forest.seed.collector.collector.VersionCollector;
+import com.danifoldi.forest.tree.command.CommandTree;
 import com.danifoldi.forest.tree.config.ConfigTree;
 import com.danifoldi.forest.tree.hazelnut.HazelnutTree;
 import com.danifoldi.forest.tree.task.Task;
@@ -14,6 +15,7 @@ import com.danifoldi.microbase.BaseSender;
 import com.danifoldi.microbase.BaseServer;
 import com.danifoldi.microbase.Microbase;
 import com.eclipsesource.json.JsonObject;
+import grapefruit.command.CommandContainer;
 import grapefruit.command.CommandDefinition;
 import grapefruit.command.dispatcher.Redirect;
 import grapefruit.command.parameter.modifier.Source;
@@ -29,13 +31,14 @@ import java.util.concurrent.CompletableFuture;
 @DependencyCollector(tree="console", minVersion="1.0.0")
 @DependencyCollector(tree="hazelnut", minVersion="1.0.0")
 @DependencyCollector(tree="task", minVersion="1.0.0")
-public class RemoteTree implements Tree {
+public class RemoteTree implements Tree, CommandContainer {
 
     RemoteConfig config;
 
     @Override
     public @NotNull CompletableFuture<?> load() {
         return CompletableFuture.runAsync(() -> {
+            GrownTrees.get(CommandTree.class).registerCommands(this);
             GrownTrees.get(HazelnutTree.class).getHazelnut().translators().add(new MessageTranslator<Task>() {
                 @Override
                 public @NotNull Class<Task> type() {
@@ -62,7 +65,10 @@ public class RemoteTree implements Tree {
 
     @Override
     public @NotNull CompletableFuture<@NotNull Boolean> unload(boolean force) {
-        return CompletableFuture.supplyAsync(() -> Microbase.shutdownThreadPool("remote", 1000, force));
+        return CompletableFuture.supplyAsync(() -> {
+            GrownTrees.get(CommandTree.class).unregisterCommands(this);
+            return Microbase.shutdownThreadPool("remote", 1000, force);
+        });
     }
 
     public void sendTask(RemoteTask task, String target) {
