@@ -1,0 +1,55 @@
+diff --git a/node_modules/vue-demi/lib/index.mjs b/node_modules/vue-demi/lib/index.mjs
+index 5af36b9..be3a96d 100644
+--- a/node_modules/vue-demi/lib/index.mjs
++++ b/node_modules/vue-demi/lib/index.mjs
+@@ -1,28 +1,34 @@
+-import Vue from 'vue'
+-import VueCompositionAPI from '@vue/composition-api/dist/vue-composition-api.mjs'
++import * as Vue from 'vue'
+ 
+-function install(_vue) {
+-  _vue = _vue || Vue
+-  if (_vue && !_vue['__composition_api_installed__'])
+-    _vue.use(VueCompositionAPI)
+-}
++var isVue2 = false
++var isVue3 = true
++var Vue2 = undefined
+ 
+-install(Vue)
++function install() {}
+ 
+-var isVue2 = true
+-var isVue3 = false
+-var Vue2 = Vue
+-var version = Vue.version
++export function set(target, key, val) {
++  if (Array.isArray(target)) {
++    target.length = Math.max(target.length, key)
++    target.splice(key, 1, val)
++    return val
++  }
++  target[key] = val
++  return val
++}
+ 
+-/**VCA-EXPORTS**/
+-export * from '@vue/composition-api/dist/vue-composition-api.mjs'
+-/**VCA-EXPORTS**/
++export function del(target, key) {
++  if (Array.isArray(target)) {
++    target.splice(key, 1)
++    return
++  }
++  delete target[key]
++}
+ 
++export * from 'vue'
+ export {
+   Vue,
+   Vue2,
+   isVue2,
+   isVue3,
+-  version,
+   install,
+ }

@@ -1,0 +1,13 @@
+name = "durable-object-gateway"
+main = "index.ts"
+compatibility_date = "2023-04-09"
+logpush = true
+
+[durable_objects]
+bindings = [
+    { name = "WS_GATEWAY", class_name = "WebSocketGateway" },
+]
+
+[[migrations]]
+tag = "2023-04-09"
+new_classes = [ "WebSocketGateway" ]
