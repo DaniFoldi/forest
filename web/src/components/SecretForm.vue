@@ -1,13 +1,18 @@
-<template>
+<script lang="ts" setup>
+  import {ref} from "vue";
 
-</template>
+  const emit = defineEmits<{
+    (e: 'update', secret: string): void
+  }>()
 
-<script>
-export default {
-    name: "SecretForm.vue"
-}
+  const secret = ref('')
 </script>
 
-<style scoped>
+<template>
+    <input type="text" v-model="secret"/>
+    <button @click="emit('update', secret)">Submit</button>
+</template>
+
+<style lang="scss" scoped>
 
 </style>

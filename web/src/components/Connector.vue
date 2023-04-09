@@ -7,21 +7,12 @@ import Connected from "./Connected.vue";
   const location = useBrowserLocation()
   const id = computed(() => location.value.pathname.split('/').pop())
   const secret = ref<string>('')
-
-
-const secretField = ref('')
-  function updateSecret(newsecret: string) {
-    secret.value = newsecret
-  }
-
 </script>
 
 <template>
-  <SecretForm v-if="secret === ''">
-    <input type="text" v-model="secretField"/>
-    <button @click="updateSecret(secretField)">Submit</button>
+  <SecretForm v-if="secret === ''" @update="i => secret = i">
   </SecretForm>
-  <Connected v-else :id="id" :secret="secret"></Connected>
+  <Connected v-else :pool="id" :secret="secret"></Connected>
 </template>
 
 <style lang="scss" scoped>
