@@ -14,9 +14,10 @@ public class BungeeForest extends Plugin {
     public void onEnable() {
         Microbase.setup(ProxyServer.getInstance(), this, getDataFolder().toPath(), MessageProvider::provide);
         TreeLoader.setInstance(loader);
-        loader.fetchMetadata();
-        loader.preloadKnownTrees();
-        loader.loadTargets();
+        loader.fetchMetadata().thenRunAsync(() -> {
+            loader.preloadKnownTrees();
+            loader.loadTargets().join();
+        }, Microbase.getThreadPool("forest")).join();
     }
 
     @Override

@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 @VersionCollector("1.0.0")
-public class RateLimitTree implements Tree {
+public class RatelimitTree implements Tree {
 
     private static final Map<String, Instant> ratelimits = new ConcurrentHashMap<>();
 

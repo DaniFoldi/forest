@@ -4,17 +4,16 @@ import com.danifoldi.dataverse.DataVerse;
 import com.danifoldi.dataverse.data.NamespacedDataVerse;
 import com.danifoldi.dml.DmlParser;
 import com.danifoldi.dml.exception.DmlParseException;
-import com.danifoldi.dml.type.DmlDocument;
 import com.danifoldi.dml.type.DmlKey;
 import com.danifoldi.dml.type.DmlObject;
+import com.danifoldi.forest.seed.GrownTrees;
 import com.danifoldi.forest.seed.Tree;
 import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
 import com.danifoldi.forest.seed.collector.collector.VersionCollector;
-import com.danifoldi.forest.tree.dataverse.DataverseNamespace;
+import com.danifoldi.forest.tree.dataverse.DataverseTree;
 import com.danifoldi.microbase.Microbase;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -37,7 +36,7 @@ public class GameprotocolTree implements Tree {
     @Override
     public @NotNull CompletableFuture<?> load() {
         return CompletableFuture.runAsync(() -> {
-            protocolDataverse = DataVerse.getDataVerse().getNamespacedDataVerse(DataverseNamespace.get(), "gameprotocol", ProtocolInfo::new);
+            protocolDataverse = DataVerse.getDataVerse().getNamespacedDataVerse(GrownTrees.get(DataverseTree.class), "gameprotocol", ProtocolInfo::new);
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(GameprotocolTree.class.getResourceAsStream("/protocols.dml"))))) {
                 DmlObject protocols = DmlParser.parse(reader.lines().collect(Collectors.joining("\n"))).asObject();
                 for (DmlKey key: protocols.keys()) {

@@ -7,7 +7,7 @@ import com.danifoldi.forest.seed.Tree;
 import com.danifoldi.forest.seed.TreeLoader;
 import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
 import com.danifoldi.forest.seed.collector.collector.VersionCollector;
-import com.danifoldi.forest.tree.dataverse.DataverseNamespace;
+import com.danifoldi.forest.tree.dataverse.DataverseTree;
 import com.danifoldi.forest.tree.listener.ForestJoinEvent;
 import com.danifoldi.forest.tree.listener.ListenerTree;
 import com.danifoldi.microbase.BasePlayer;
@@ -89,7 +89,28 @@ public class TaskTree implements Tree {
                 }
             }, Microbase.getThreadPool("task")));
 
-            taskDataverse = DataVerse.getDataVerse().getNamespacedMultiDataVerse(DataverseNamespace.get(), "task_queue_%s".formatted(TreeLoader.getServerId()), Task::new);
+            registerTaskHandler("compound", task -> CompletableFuture.supplyAsync(() -> {
+                Pattern pattern = Pattern.compile("compound");
+                Matcher matcher = pattern.matcher(task.type);
+                if (!matcher.matches()) {
+                    Microbase.logger.log(Level.WARNING, "Failed to parse compound task %s".formatted(task));
+                    return false;
+                }
+
+                Pattern queuedPattern = Pattern.compile("(?<type>\\w+):(?<value>.*?)");
+                String[] tasks = task.value.split(";");
+                for (String queuedTask: tasks) {
+                    Matcher queuedMatcher = queuedPattern.matcher(queuedTask);
+                    if (!queuedMatcher.matches()) {
+                        Microbase.logger.log(Level.WARNING, "Failed to parse compound task %s".formatted(queuedTask));
+                        return false;
+                    }
+                    run(new Task(queuedMatcher.group("type"), queuedMatcher.group("value")));
+                }
+                return true;
+            }, Microbase.getThreadPool("task")));
+
+            taskDataverse = DataVerse.getDataVerse().getNamespacedMultiDataVerse(GrownTrees.get(DataverseTree.class), "task_queue_%s".formatted(TreeLoader.getServerId()), Task::new);
             GrownTrees.get(ListenerTree.class).addListener(TaskTree.class, ForestJoinEvent.class, event -> {
                 taskDataverse.get(event.playerName().toLowerCase(Locale.ROOT)).thenAcceptAsync(tasks -> {
                     for (Task task: tasks) {
@@ -97,6 +118,9 @@ public class TaskTree implements Tree {
                         taskDataverse.delete(event.playerName().toLowerCase(Locale.ROOT), task);
                     }
                 }, Microbase.getThreadPool("task"));
+                unregisterTaskHandler("player");
+                unregisterTaskHandler("console");
+                unregisterTaskHandler("compound");
             });
         }, Microbase.getThreadPool("task"));
     }

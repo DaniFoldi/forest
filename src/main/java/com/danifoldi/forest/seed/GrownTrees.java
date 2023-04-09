@@ -10,7 +10,7 @@ public class GrownTrees {
     public static<T> T get(Class<T> clazz) {
         String className = clazz.getName();
         String packageName = className.substring(0, className.lastIndexOf('.'));
-        String lastPackage = packageName.substring(packageName.indexOf('.'));
+        String lastPackage = packageName.substring(packageName.lastIndexOf('.') + 1);
         TreeInfo info = TreeLoader.knownTrees.get(lastPackage);
         if (info == null || !info.loaded) {
             Microbase.logger.log(Level.SEVERE, "Attempted to get tree %s with class %s".formatted(lastPackage, className));

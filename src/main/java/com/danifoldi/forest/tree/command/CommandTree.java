@@ -2,12 +2,13 @@ package com.danifoldi.forest.tree.command;
 
 import com.danifoldi.dataverse.DataVerse;
 import com.danifoldi.dataverse.data.NamespacedMultiDataVerse;
+import com.danifoldi.forest.seed.GrownTrees;
 import com.danifoldi.forest.seed.MessageProvider;
 import com.danifoldi.forest.seed.Tree;
 import com.danifoldi.forest.seed.collector.collector.DependencyCollector;
 import com.danifoldi.forest.seed.collector.collector.MessageCollector;
 import com.danifoldi.forest.seed.collector.collector.VersionCollector;
-import com.danifoldi.forest.tree.dataverse.DataverseNamespace;
+import com.danifoldi.forest.tree.dataverse.DataverseTree;
 import com.danifoldi.microbase.BaseSender;
 import com.danifoldi.microbase.Microbase;
 import com.google.common.reflect.TypeToken;
@@ -46,8 +47,7 @@ public class CommandTree implements Tree {
     @Override
     public @NotNull CompletableFuture<?> load() {
         return CompletableFuture.runAsync(() -> {
-            commandDataverse = DataVerse.getDataVerse().getNamespacedMultiDataVerse(DataverseNamespace.get(), "command_alias", CommandConfig::new);
-            //noinspection UnstableApiUsage
+            commandDataverse = DataVerse.getDataVerse().getNamespacedMultiDataVerse(GrownTrees.get(DataverseTree.class), "command_alias", CommandConfig::new);
             dispatcher = CommandDispatcher.builder(TypeToken.of(BaseSender.class))
                     .withAuthorizer(BaseSender::hasPermission)
                     .withMessenger(BaseSender::send)

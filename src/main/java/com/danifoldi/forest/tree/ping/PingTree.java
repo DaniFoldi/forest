@@ -14,6 +14,7 @@ import com.danifoldi.microbase.BaseSender;
 import com.danifoldi.microbase.Microbase;
 import grapefruit.command.CommandContainer;
 import grapefruit.command.CommandDefinition;
+import grapefruit.command.parameter.modifier.OptParam;
 import grapefruit.command.parameter.modifier.Source;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,14 +26,14 @@ import java.util.concurrent.CompletableFuture;
 public class PingTree implements Tree, CommandContainer {
     @Override
     public @NotNull CompletableFuture<?> load() {
-        return CompletableFuture.runAsync(() -> GrownTrees.get(CommandTree.class).registerCommands(this));
+        return CompletableFuture.runAsync(() -> GrownTrees.get(CommandTree.class).registerCommands(this), Microbase.getThreadPool("ping"));
     }
 
     @Override
     public @NotNull CompletableFuture<@NotNull Boolean> unload(boolean force) {
         return CompletableFuture.supplyAsync(() -> {
             GrownTrees.get(CommandTree.class).unregisterCommands(this);
-            return true;
+            return Microbase.shutdownThreadPool("ping", 1000, force);
         });
     }
 

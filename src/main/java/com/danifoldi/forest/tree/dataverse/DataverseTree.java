@@ -1,6 +1,7 @@
 package com.danifoldi.forest.tree.dataverse;
 
 import com.danifoldi.dataverse.DataVerse;
+import com.danifoldi.dataverse.data.Namespaced;
 import com.danifoldi.forest.seed.Tree;
 import com.danifoldi.forest.seed.collector.collector.VersionCollector;
 import com.danifoldi.microbase.Microbase;
@@ -12,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 @VersionCollector("1.0.0")
-public class DataverseTree implements Tree {
+public class DataverseTree implements Tree, Namespaced {
 
     @Override
     public @NotNull CompletableFuture<?> load() {
@@ -40,5 +41,10 @@ public class DataverseTree implements Tree {
     @Override
     public @NotNull CompletableFuture<@NotNull Boolean> unload(boolean force) {
         return CompletableFuture.supplyAsync(() -> Microbase.shutdownThreadPool("dataverse", 1000, force));
+    }
+
+    @Override
+    public @NotNull String getNamespace() {
+        return "Forest";
     }
 }

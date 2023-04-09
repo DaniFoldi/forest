@@ -1,6 +1,7 @@
 package com.danifoldi.forest.tree.paginate;
 
 import com.danifoldi.forest.seed.Tree;
+import com.danifoldi.forest.seed.collector.collector.VersionCollector;
 import com.danifoldi.microbase.BaseMessage;
 import com.danifoldi.microbase.Microbase;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
+@VersionCollector("1.0.0")
 public class PaginateTree implements Tree {
     @Override
     public @NotNull CompletableFuture<?> load() {
