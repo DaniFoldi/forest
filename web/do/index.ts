@@ -15,7 +15,7 @@ export class WebSocketGateway implements DurableObject {
     const id = url.pathname.split('/').pop()
     const secret = request.headers.get('x-forest-secret') ?? request.headers.get('sec-websocket-protocol').replace('forest', '').replace(',','').trim()
 
-    console.log(`Connection from ${id} ${secret.replaceAll(/[^a-zA-Z0-9]/, '')} ${url} ${request.headers.get('user-agent')}`)
+    console.log(`Connection from ${id} ${secret.replaceAll(/[^a-zA-Z0-9]/g, '')} ${url} ${request.headers.get('user-agent')}`)
     console.log(`Id ${request.headers.get('cf-ray')} ${request.headers.get('cf-connecting-ip')} ${request.headers.get('cf-ipcountry')}`)
 
     if (!secret) {
@@ -26,7 +26,7 @@ export class WebSocketGateway implements DurableObject {
     let session = this.sessions.get(id)
 
     if (!session && !request.headers.get('user-agent')?.includes('Forest')) {
-      return new Response('bad request', {
+      return new Response('missing server session', {
         status: 400
       })
     }
@@ -81,14 +81,16 @@ export class WebSocketGateway implements DurableObject {
 
     client.addEventListener('error', event => {
       console.error(event)
-      session?.sockets.forEach(socket => socket.close(1000))
-      this.sessions.delete(id)
     })
 
     client.addEventListener('close', event => {
       console.log(event)
-      session?.sockets.forEach(socket => socket.close(1000))
-      this.sessions.delete(id)
+      if (session?.sockets.length === 0) {
+        session.server.close()
+        this.sessions.delete(id)0
+      } else {
+        session && (session.sockets = session?.sockets.filter(socket => socket !== client))
+      }
     })
 
     return new Response(null, {
