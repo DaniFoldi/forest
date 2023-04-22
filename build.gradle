@@ -101,7 +101,6 @@ task 'build-tree' {
             }
 
             task "build-tree-${f.parentFile.name}"(type: ShadowJar) {
-                classifier = 'all'
                 from sourceSets.main.output
                 minimize()
                 include "com/danifoldi/forest/tree/${f.parentFile.name}/*"
