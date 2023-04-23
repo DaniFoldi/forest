@@ -58,7 +58,7 @@ dependencies {
     implementation ('com.cronutils:cron-utils:9.2.1') {
         exclude module: 'slf4j-api'
     }
-    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
     implementation 'com.github.stefvanschie.inventoryframework:IF:0.10.9'
     compileOnly 'net.luckperms:api:5.4'
     compileOnly ('com.github.LeonMangler:PremiumVanishAPI:2.7.11-2') {
