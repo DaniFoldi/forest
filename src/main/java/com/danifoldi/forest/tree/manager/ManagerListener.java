@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -43,7 +44,7 @@ public class ManagerListener extends WebSocketListener {
 
     @Override
     public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
-        webSocket.send("connected");
+        webSocket.send("{connected: true}");
         logStream = entry -> {
             webSocket.send(DmlSerializer.serialize(new DmlObject(Map.of(
                     new DmlKey("type"), new DmlString("log"),
@@ -216,6 +217,7 @@ public class ManagerListener extends WebSocketListener {
                 e.printStackTrace();
             }
         } catch (DmlParseException e) {
+            Microbase.logger.log(Level.WARNING, e.getMessage());
             webSocket.close(1002, null);
         }
     }

@@ -13,7 +13,7 @@ import {tryOnMounted} from "@vueuse/core";
     const ws = new WebSocket(`wss://forest.danifoldi.com/api/${pool.value}`, ['forest', secret.value])
     ws.onopen = () => {
       console.log('connected')
-      ws.send('apiVersion')
+      ws.send('{type:"apiVersion",id:"1"}')
     }
     ws.onmessage = (e) => {
       console.log('message', e)

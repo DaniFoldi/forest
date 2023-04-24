@@ -64,7 +64,7 @@ public class ManagerTree implements Tree, CommandContainer {
                 .Builder()
                 .url("https://forest.danifoldi.com/api/%s".formatted(uuid))
                 .header("User-Agent", "Forest Manager Tree")
-                        .header("X-Forest-Secret", secret.replaceAll("[^a-zA-Z0-9]", ""))
+                .header("X-Forest-Secret", secret.replaceAll("[^a-zA-Z0-9]", ""))
                 .build(),
                 new ManagerListener());
         websockets.add(webSocket);
