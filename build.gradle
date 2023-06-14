@@ -73,7 +73,7 @@ dependencies {
         exclude module: 'annotations'
     }
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.8'
-    compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.14'
+    compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.15'
     // compileOnly 'me.clip:placeholderapi:2.11.2'
     // compileOnly 'com.plotsquared:PlotSquared-Core:6.10.2'
     // compileOnly 'com.plotsquared:PlotSquared-Bukkit:6.10.2'
