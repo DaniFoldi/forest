@@ -59,7 +59,7 @@ dependencies {
         exclude module: 'slf4j-api'
     }
     implementation 'com.squareup.okhttp3:okhttp:4.11.0'
-    implementation 'com.github.stefvanschie.inventoryframework:IF:0.10.10'
+    implementation 'com.github.stefvanschie.inventoryframework:IF:0.10.11'
     compileOnly 'net.luckperms:api:5.4'
     compileOnly ('com.github.LeonMangler:PremiumVanishAPI:2.8.8') {
         exclude module: 'jsr305'
