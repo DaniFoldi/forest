@@ -16,12 +16,12 @@
     "@formkit/auto-animate": "^1.0.0-pre-alpha.3",
     "@vueuse/components": "^10.2.1",
     "@vueuse/core": "^10.2.1",
-    "astro": "^2.9.2",
+    "astro": "^2.9.3",
     "tailwindcss": "^3.3.3",
     "vue": "^3.3.4"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20230717.1",
+    "@cloudflare/workers-types": "^4.20230724.0",
     "wrangler": "^2.20.0"
   }
 }
