@@ -16,7 +16,7 @@
     "@formkit/auto-animate": "^1.0.0-pre-alpha.3",
     "@vueuse/components": "^10.3.0",
     "@vueuse/core": "^10.3.0",
-    "astro": "^2.9.7",
+    "astro": "^2.10.1",
     "tailwindcss": "^3.3.3",
     "vue": "^3.3.4"
   },
